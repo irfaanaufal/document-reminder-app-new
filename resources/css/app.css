@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] {
+	display: none !important;
+}
+
+/* Ensure datatable info is visible and the injected legend is aligned */
+/* Hide the default datatable info (showing x to y of z entries) */
+.datatable-info {
+    display: none !important;
+}

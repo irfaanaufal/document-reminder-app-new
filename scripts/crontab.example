@@ -1,0 +1,10 @@
+# Laravel scheduler — salin baris ini ke crontab server Linux (crontab -e)
+# Ganti /var/www/reminder-app dengan path project Anda.
+
+* * * * * cd /var/www/reminder-app && php artisan schedule:run >> /dev/null 2>&1
+
+# Jadwal reminder (routes/console.php) — Senin–Sabtu, 08:30–10:00 WIB:
+# - 08:30 WIB: reminders:queue  (buat log notifikasi hari ini)
+# - 08:35 WIB: reminders:send   (kirim WhatsApp via Fonnte)
+#
+# Output command ada di: storage/logs/scheduler.log
