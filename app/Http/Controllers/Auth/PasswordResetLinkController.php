@@ -30,16 +30,71 @@ class PasswordResetLinkController extends Controller
             'email' => ['required', 'email'],
         ]);
 
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
+        $user = \App\Models\User::where('email', $request->email)->first();
 
-        return $status == Password::RESET_LINK_SENT
-                    ? back()->with('status', __($status))
-                    : back()->withInput($request->only('email'))
-                        ->withErrors(['email' => __($status)]);
+        if (! $user) {
+            throw ValidationException::withMessages([
+                'email' => __('Alamat email tidak ditemukan dalam sistem.'),
+            ]);
+        }
+
+        // Generate 6-digit OTP
+        $otp = sprintf('%06d', mt_rand(0, 999999));
+
+        $user->update([
+            'reset_otp' => $otp,
+            'reset_otp_expires_at' => now()->addMinutes(15),
+        ]);
+
+        // Put email in session to be verified
+        $request->session()->put('reset_password_email', $request->email);
+
+        return redirect()->route('password.otp.show');
+    }
+
+    /**
+     * Display the OTP verification form.
+     */
+    public function showOtpForm(Request $request): View
+    {
+        $email = $request->session()->get('reset_password_email') ?? $request->email;
+
+        if (! $email) {
+            return view('auth.forgot-password')->withErrors(['email' => 'Silakan masukkan email terlebih dahulu.']);
+        }
+
+        return view('auth.verify-otp', ['email' => $email]);
+    }
+
+    /**
+     * Verify the submitted OTP code.
+     */
+    public function verifyOtp(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'email' => ['required', 'email'],
+            'otp' => ['required', 'string', 'size:6'],
+        ]);
+
+        $user = \App\Models\User::where('email', $request->email)->first();
+
+        if (! $user || ! $user->reset_otp || $user->reset_otp !== $request->otp || now()->gt($user->reset_otp_expires_at)) {
+            return back()->withInput($request->only('email', 'otp'))
+                ->withErrors(['otp' => 'Kode OTP tidak valid atau telah kedaluwarsa. Silakan minta ulang atau hubungi Super Admin.']);
+        }
+
+        // OTP is correct! Clear it from database
+        $user->update([
+            'reset_otp' => null,
+            'reset_otp_expires_at' => null,
+        ]);
+
+        // Store email verified state in session for reset-password
+        $request->session()->put('otp_verified_email', $request->email);
+
+        return redirect()->route('password.reset', [
+            'token' => 'otp',
+            'email' => $request->email
+        ]);
     }
 }

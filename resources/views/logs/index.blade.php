@@ -90,6 +90,7 @@
                 <table class="min-w-[980px] w-full divide-y divide-gray-200 dark:divide-zinc-800 text-sm">
                     <thead class="bg-gray-50 dark:bg-zinc-900">
                         <tr>
+                            <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-300">No</th>
                             <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-300">Waktu</th>
                             <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-300">Dokumen</th>
                             <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-300">PIC</th>
@@ -116,6 +117,7 @@
                                 $document = $log->documentReminder;
                             @endphp
                             <tr>
+                                <td class="px-4 py-3 align-top text-gray-900 dark:text-zinc-100 font-medium whitespace-nowrap">{{ $logs->firstItem() + $loop->index }}</td>
                                 <td class="px-4 py-3 align-top text-gray-900 dark:text-zinc-100 whitespace-nowrap">
                                     <div class="font-medium">{{ optional($log->scheduled_for)->format('d-m-Y') ?? '-' }}</div>
                                     <div class="text-xs text-gray-500 dark:text-zinc-400">{{ optional($log->sent_at)->format('d-m-Y H:i') ?? 'Belum terkirim' }}</div>
@@ -152,7 +154,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-zinc-400">Belum ada data log dengan filter saat ini.</td>
+                                <td colspan="9" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-zinc-400">Belum ada data log dengan filter saat ini.</td>
                             </tr>
                         @endforelse
                     </tbody>

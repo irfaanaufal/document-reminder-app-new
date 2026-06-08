@@ -116,7 +116,7 @@
                             x-transition:leave="transition ease-in duration-100"
                             x-transition:leave-start="opacity-100 scale-100"
                             x-transition:leave-end="opacity-0 scale-95"
-                            class="absolute right-0 z-50 mt-2 w-80 max-w-[calc(100vw-1rem)] overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-xl dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-black/40"
+                            class="absolute right-[-50px] lg:right-0 z-50 mt-2 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-xl dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-black/40"
                         >
                             <div class="border-b border-zinc-200 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-900">
                                 <p class="text-sm font-semibold text-gray-800 dark:text-zinc-100">Filter Kolom</p>

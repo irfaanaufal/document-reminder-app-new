@@ -48,6 +48,7 @@
                 <table class="min-w-[860px] w-full divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
                     <thead class="bg-gray-50 dark:bg-zinc-900">
                         <tr>
+                            <th class="px-4 py-3 text-left text-[13px] font-bold tracking-wide text-gray-700 dark:text-zinc-200">No</th>
                             <th class="px-4 py-3 text-left text-[13px] font-bold tracking-wide text-gray-700 dark:text-zinc-200">Nama</th>
                             <th class="px-4 py-3 text-left text-[13px] font-bold tracking-wide text-gray-700 dark:text-zinc-200">Email</th>
                             <th class="px-4 py-3 text-left text-[13px] font-bold tracking-wide text-gray-700 dark:text-zinc-200">Role</th>
@@ -60,7 +61,10 @@
                             @php
                                 $formId = 'access-form-'.$account->id;
                             @endphp
-                            <tr class="hover:bg-zinc-50/70 dark:hover:bg-zinc-800/30">
+                             <tr class="hover:bg-zinc-50/70 dark:hover:bg-zinc-800/30">
+                                <td class="px-4 py-3 text-gray-900 dark:text-zinc-100 font-medium">
+                                    {{ $users->firstItem() + $loop->index }}
+                                </td>
                                 <td class="px-4 py-3 text-gray-900 dark:text-zinc-100">
                                     <div class="font-medium">{{ $account->nama }}</div>
                                 </td>
@@ -104,6 +108,9 @@
                     </tbody>
                 </table>
             </div>
+            <div class="border-t border-zinc-200 px-4 py-3 dark:border-zinc-800">
+                {{ $users->links() }}
+            </div>
         </div>
 
         <div class="mt-5 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
@@ -116,6 +123,7 @@
                 <table class="min-w-[900px] w-full divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
                     <thead class="bg-gray-50 dark:bg-zinc-900">
                         <tr>
+                            <th class="px-4 py-3 text-left text-[13px] font-bold tracking-wide text-gray-700 dark:text-zinc-200">No</th>
                             <th class="px-4 py-3 text-left text-[13px] font-bold tracking-wide text-gray-700 dark:text-zinc-200">Waktu</th>
                             <th class="px-4 py-3 text-left text-[13px] font-bold tracking-wide text-gray-700 dark:text-zinc-200">Diubah Oleh</th>
                             <th class="px-4 py-3 text-left text-[13px] font-bold tracking-wide text-gray-700 dark:text-zinc-200">Target User</th>
@@ -126,6 +134,7 @@
                     <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
                         @forelse ($recentLogs as $log)
                             <tr class="hover:bg-zinc-50/70 dark:hover:bg-zinc-800/30">
+                                <td class="px-4 py-3 text-gray-900 dark:text-zinc-100 font-medium">{{ $loop->iteration }}</td>
                                 <td class="px-4 py-3 text-gray-900 dark:text-zinc-100">{{ $log->created_at?->format('d-m-Y H:i:s') ?? '-' }}</td>
                                 <td class="px-4 py-3 text-gray-700 dark:text-zinc-300">{{ $log->actor?->nama ?? 'Sistem' }}</td>
                                 <td class="px-4 py-3 text-gray-700 dark:text-zinc-300">{{ $log->target?->nama ?? '-' }}</td>
@@ -142,7 +151,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-4 py-6 text-center text-gray-500 dark:text-zinc-400">Belum ada riwayat perubahan.</td>
+                                <td colspan="6" class="px-4 py-6 text-center text-gray-500 dark:text-zinc-400">Belum ada riwayat perubahan.</td>
                             </tr>
                         @endforelse
                     </tbody>

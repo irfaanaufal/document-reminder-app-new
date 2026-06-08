@@ -1,10 +1,10 @@
 <section>
     <header>
-        <h2 class="text-lg font-medium text-slate-900">
+        <h2 class="text-lg font-medium text-slate-900 dark:text-zinc-100">
             {{ __('Informasi Profil') }}
         </h2>
 
-        <p class="mt-1 text-sm text-slate-600">
+        <p class="mt-1 text-sm text-slate-600 dark:text-zinc-400">
             {{ __("Perbarui informasi profil akun, nomor telepon, dan alamat email Anda.") }}
         </p>
     </header>
@@ -36,10 +36,10 @@
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                 <div>
-                    <p class="text-sm mt-2 text-slate-800">
+                    <p class="text-sm mt-2 text-slate-800 dark:text-zinc-200">
                         {{ __('Alamat email Anda belum terverifikasi.') }}
 
-                        <button form="send-verification" class="underline text-sm text-slate-600 hover:text-slate-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">
+                        <button form="send-verification" class="underline text-sm text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">
                             {{ __('Klik di sini untuk mengirim ulang email verifikasi.') }}
                         </button>
                     </p>
