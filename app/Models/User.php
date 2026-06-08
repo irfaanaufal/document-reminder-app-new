@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['nama', 'email', 'password', 'role', 'no_telpon', 'is_active', 'reset_otp', 'reset_otp_expires_at'])]
+#[Fillable(['nama', 'email', 'password', 'role', 'no_telpon', 'is_active', 'reset_otp', 'reset_otp_expires_at', 'can_use_chatbot'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -35,6 +35,7 @@ class User extends Authenticatable
             'role' => 'integer',
             'is_active' => 'boolean',
             'reset_otp_expires_at' => 'datetime',
+            'can_use_chatbot' => 'boolean',
         ];
     }
 
@@ -90,5 +91,10 @@ class User extends Authenticatable
     public function assignedReminders()
     {
         return $this->belongsToMany(DocumentReminder::class, 'document_reminder_user');
+    }
+
+    public function canUseChatbot(): bool
+    {
+        return (bool) $this->can_use_chatbot;
     }
 }

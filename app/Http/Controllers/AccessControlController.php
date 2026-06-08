@@ -66,6 +66,7 @@ class AccessControlController extends Controller
         $validated = $request->validate([
             'role' => ['required', 'integer', 'in:1,2,3'],
             'is_active' => ['required', 'boolean'],
+            'can_use_chatbot' => ['nullable'],
         ]);
 
         $actor = $request->user();
@@ -82,16 +83,21 @@ class AccessControlController extends Controller
 
         $oldRole = (int) $user->role;
         $oldIsActive = (bool) $user->is_active;
+        $oldCanUseChatbot = (bool) $user->can_use_chatbot;
         $newRole = (int) $validated['role'];
         $newIsActive = (bool) $validated['is_active'];
+        // Handle can_use_chatbot correctly: if it's an array, take the last value
+        $canUseChatbotValue = $validated['can_use_chatbot'] ?? false;
+        $newCanUseChatbot = (bool) (is_array($canUseChatbotValue) ? end($canUseChatbotValue) : $canUseChatbotValue);
 
-        if ($oldRole === $newRole && $oldIsActive === $newIsActive) {
+        if ($oldRole === $newRole && $oldIsActive === $newIsActive && $oldCanUseChatbot === $newCanUseChatbot) {
             return back()->with('success', 'Tidak ada perubahan hak akses.');
         }
 
         $user->update([
             'role' => $newRole,
             'is_active' => $newIsActive,
+            'can_use_chatbot' => $newCanUseChatbot,
         ]);
 
         UserAccessChangeLog::create([

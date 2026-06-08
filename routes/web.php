@@ -5,6 +5,7 @@ use App\Http\Controllers\DocumentReminderController;
 use App\Http\Controllers\DocumentTypeController;
 use App\Http\Controllers\ReminderLogController;
 use App\Http\Controllers\AccessControlController;
+use App\Http\Controllers\ChatbotController;
 use App\Models\DocumentReminder;
 use App\Models\DocumentType;
 use Carbon\CarbonPeriod;
@@ -16,6 +17,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/chatbot', [ChatbotController::class, 'index'])->name('chatbot.index');
+Route::post('/chatbot/send', [ChatbotController::class, 'sendMessage'])->name('chatbot.send');
 
 Route::get('/dashboard', function () {
     $today = now();

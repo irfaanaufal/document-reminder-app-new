@@ -45,7 +45,7 @@
             </div>
 
             <div class="overflow-x-auto">
-                <table class="min-w-[860px] w-full divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
+                <table class="min-w-[1000px] w-full divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
                     <thead class="bg-gray-50 dark:bg-zinc-900">
                         <tr>
                             <th class="px-4 py-3 text-left text-[13px] font-bold tracking-wide text-gray-700 dark:text-zinc-200">No</th>
@@ -53,6 +53,7 @@
                             <th class="px-4 py-3 text-left text-[13px] font-bold tracking-wide text-gray-700 dark:text-zinc-200">Email</th>
                             <th class="px-4 py-3 text-left text-[13px] font-bold tracking-wide text-gray-700 dark:text-zinc-200">Role</th>
                             <th class="px-4 py-3 text-left text-[13px] font-bold tracking-wide text-gray-700 dark:text-zinc-200">Status</th>
+                            <th class="px-4 py-3 text-left text-[13px] font-bold tracking-wide text-gray-700 dark:text-zinc-200">Akses AI</th>
                             <th class="px-4 py-3 text-left text-[13px] font-bold tracking-wide text-gray-700 dark:text-zinc-200">Aksi</th>
                         </tr>
                     </thead>
@@ -90,6 +91,26 @@
                                         </label>
                                         <span class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold {{ $account->is_active ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300' : 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-300' }}">
                                             {{ $account->is_active ? 'Active' : 'Inactive' }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-2">
+                                        <label class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-zinc-200">
+                                            <!-- Hidden input to send value when checkbox is not checked -->
+                                            <input form="{{ $formId }}" type="hidden" name="can_use_chatbot" value="0">
+                                            <input
+                                                form="{{ $formId }}"
+                                                type="checkbox"
+                                                name="can_use_chatbot"
+                                                value="1"
+                                                class="rounded border-zinc-300 text-blue-600 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-800"
+                                                @checked($account->can_use_chatbot)
+                                            >
+                                            <span>{{ $account->can_use_chatbot ? 'Diizinkan' : 'Tidak Diizinkan' }}</span>
+                                        </label>
+                                        <span class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold {{ $account->can_use_chatbot ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300' : 'bg-gray-50 text-gray-600 dark:bg-gray-800/50 dark:text-gray-400' }}">
+                                            {{ $account->can_use_chatbot ? 'Yes' : 'No' }}
                                         </span>
                                     </div>
                                 </td>
