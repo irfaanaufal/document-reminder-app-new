@@ -18,6 +18,10 @@ return new class extends Migration
                 ->constrained('users')
                 ->nullOnDelete();
         });
+
+        Schema::disableForeignKeyConstraints();
+        \Illuminate\Support\Facades\DB::table('document_types')->whereNull('created_by')->update(['created_by' => 1]);
+        Schema::enableForeignKeyConstraints();
     }
 
     /**

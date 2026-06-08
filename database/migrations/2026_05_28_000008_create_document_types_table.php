@@ -23,6 +23,8 @@ return new class extends Migration
         DB::table('document_types')->insert([
             ['nama_jenis' => 'Sertifikat', 'label' => 'Sertifikat', 'tipe_form' => 'sertifikat', 'created_at' => now(), 'updated_at' => now()],
             ['nama_jenis' => 'Wajib Lapor Tahunan', 'label' => 'Wajib Lapor Tahunan', 'tipe_form' => 'wajib_lapor_tahunan', 'created_at' => now(), 'updated_at' => now()],
+            ['nama_jenis' => 'SLO', 'label' => 'SLO', 'tipe_form' => 'slo', 'created_at' => now(), 'updated_at' => now()],
+            ['nama_jenis' => 'Legalitas', 'label' => 'Legalitas', 'tipe_form' => 'legalitas', 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 
