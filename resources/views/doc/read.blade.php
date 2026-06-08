@@ -47,44 +47,44 @@
                 'sisa_hari' => 'Sisa Hari',
                 'aksi' => 'Aksi',
             ];
+
+            $isDocTypeSelected = function($docType) use ($activeJenis) {
+                if ($activeJenis == $docType->id) return true;
+                if (strtolower($activeJenis) === strtolower($docType->nama_jenis)) return true;
+                if ($activeJenis === 'spt' && strtolower($docType->nama_jenis) === 'wajib lapor tahunan') return true;
+                return false;
+            };
         @endphp
 
         <div class="mb-4">
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <!-- Left side: Dropdown Filter Jenis Dokumen & Show Entries -->
+                <div class="flex items-center gap-3 w-full lg:w-auto">
+                    <div class="flex-1 lg:flex-initial">
+                        <select id="filter_jenis" onchange="window.location.href = this.value" class="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 font-medium lg:min-w-[200px]">
+                            <option value="{{ route('dokumen', ['jenis' => 'semua']) }}" @selected($activeJenis === 'semua' || empty($activeJenis))>Semua Jenis Dokumen</option>
+                            @foreach ($documentTypes as $docType)
+                                <option value="{{ route('dokumen', ['jenis' => $docType->id]) }}" @selected($isDocTypeSelected($docType))>
+                                    {{ $docType->nama_jenis }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
 
-            <div class="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
-
-                {{-- Tabs --}}
-                <div class="flex items-end overflow-x-auto whitespace-nowrap scrollbar-hide">
-                    <a href="{{ route('dokumen', ['jenis' => 'semua']) }}"
-                       style="border-radius: 12px 12px 0 0;"
-                       class="inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium text-center transition-colors border border-b-0
-                              {{ $activeJenis === 'semua'
-                                  ? 'bg-green-600 text-white border-green-600 relative z-10'
-                                  : 'bg-white text-zinc-500 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-900 dark:text-zinc-400 dark:border-zinc-600 dark:hover:bg-zinc-800' }}">
-                        Semua
-                    </a>
-
-                    <a href="{{ route('dokumen', ['jenis' => 'sertifikat']) }}"
-                       style="border-radius: 12px 12px 0 0;"
-                       class="inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium text-center transition-colors border border-b-0
-                              {{ $activeJenis === 'sertifikat'
-                                  ? 'bg-green-600 text-white border-green-600 relative z-10'
-                                  : 'bg-white text-zinc-500 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-900 dark:text-zinc-400 dark:border-zinc-600 dark:hover:bg-zinc-800' }}">
-                        Sertifikat
-                    </a>
-
-                    <a href="{{ route('dokumen', ['jenis' => 'spt']) }}"
-                       style="border-radius: 12px 12px 0 0;"
-                       class="inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium text-center transition-colors border border-b-0
-                              {{ $activeJenis === 'spt'
-                                  ? 'bg-green-600 text-white border-green-600 relative z-10'
-                                  : 'bg-white text-zinc-500 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-900 dark:text-zinc-400 dark:border-zinc-600 dark:hover:bg-zinc-800' }}">
-                        Wajib Lapor
-                    </a>
+                    <select
+                        data-datatable-perpage
+                        class="flex-shrink-0 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+                    >
+                        <option value="15">15</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
                 </div>
 
-                <div class="mb-4 flex items-center gap-3 w-fulls">
-                    <div class="flex-1 max-w-xs">
+                <!-- Right side: Search, Filter, Create -->
+                <div class="flex items-center gap-3 w-full lg:w-auto lg:ml-auto">
+                    <div class="flex-1 lg:flex-initial lg:w-64">
                         <input
                             type="search"
                             data-datatable-search-input
@@ -92,84 +92,72 @@
                             class="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
                         >
                     </div>
-                    <div class="flex items-center gap-3 ml-auto">
-                        <select
-                            data-datatable-perpage
-                            class="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+
+                    <div class="relative flex-shrink-0" x-data="{ open: false }">
+                        <button
+                            type="button"
+                            @click="open = !open"
+                            aria-label="Filter Kolom"
+                            title="Filter Kolom"
+                            class="inline-flex h-[38px] w-[38px] items-center justify-center rounded-md bg-blue-700 text-white hover:bg-blue-800 transition-colors"
                         >
-                            <option value="15">15</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M3.25 4.5A1.25 1.25 0 014.5 3.25h11A1.25 1.25 0 0116.75 4.5v1.039c0 .332-.132.65-.366.884L12.75 10.107v5.143a.75.75 0 01-.27.578l-2 1.75a.75.75 0 01-1.23-.578v-6.893L3.616 6.423A1.25 1.25 0 013.25 5.54V4.5z" />
+                            </svg>
+                        </button>
 
-                        <div class="relative" x-data="{ open: false }">
-                            <button
-                                type="button"
-                                @click="open = !open"
-                                aria-label="Filter Kolom"
-                                title="Filter Kolom"
-                                class="inline-flex items-center justify-center rounded-md bg-blue-700 px-4 py-2 text-white text-sm font-semibold hover:bg-blue-800 transition-colors whitespace-nowrap"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M3.25 4.5A1.25 1.25 0 014.5 3.25h11A1.25 1.25 0 0116.75 4.5v1.039c0 .332-.132.65-.366.884L12.75 10.107v5.143a.75.75 0 01-.27.578l-2 1.75a.75.75 0 01-1.23-.578v-6.893L3.616 6.423A1.25 1.25 0 013.25 5.54V4.5z" />
-                                </svg>
-                            </button>
+                        <div
+                            x-cloak
+                            x-show="open"
+                            @click.outside="open = false"
+                            x-transition:enter="transition ease-out duration-150"
+                            x-transition:enter-start="opacity-0 scale-95"
+                            x-transition:enter-end="opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-100"
+                            x-transition:leave-start="opacity-100 scale-100"
+                            x-transition:leave-end="opacity-0 scale-95"
+                            class="absolute right-0 z-50 mt-2 w-80 max-w-[calc(100vw-1rem)] overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-xl dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-black/40"
+                        >
+                            <div class="border-b border-zinc-200 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-900">
+                                <p class="text-sm font-semibold text-gray-800 dark:text-zinc-100">Filter Kolom</p>
+                                <p class="text-xs text-gray-500 dark:text-zinc-400">Klik untuk tampil atau sembunyikan kolom.</p>
+                            </div>
 
-                            <div
-                                x-cloak
-                                x-show="open"
-                                @click.outside="open = false"
-                                x-transition:enter="transition ease-out duration-150"
-                                x-transition:enter-start="opacity-0 scale-95"
-                                x-transition:enter-end="opacity-100 scale-100"
-                                x-transition:leave="transition ease-in duration-100"
-                                x-transition:leave-start="opacity-100 scale-100"
-                                x-transition:leave-end="opacity-0 scale-95"
-                                class="absolute right-0 z-50 mt-2 w-80 max-w-[calc(100vw-1rem)] overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-xl dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-black/40"
-                            >
-                                <div class="border-b border-zinc-200 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-900">
-                                    <p class="text-sm font-semibold text-gray-800 dark:text-zinc-100">Filter Kolom</p>
-                                    <p class="text-xs text-gray-500 dark:text-zinc-400">Klik untuk tampil atau sembunyikan kolom.</p>
-                                </div>
-
-                                <div class="space-y-2 p-3">
-                                    @foreach ($filterableColumns as $key => $label)
-                                        <button
-                                            type="button"
-                                            @click="columns.{{ $key }} = !columns.{{ $key }}"
-                                            class="flex w-full items-center justify-between rounded-md border px-3 py-2 text-sm transition-colors"
-                                            :class="columns.{{ $key }} ? 'border-green-500 bg-green-50 text-green-700 dark:border-green-500 dark:bg-green-900/25 dark:text-green-300' : 'border-zinc-300 bg-white text-gray-700 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700'"
-                                        >
-                                            <span class="whitespace-nowrap">{{ $label }}</span>
-                                            <svg x-show="columns.{{ $key }}" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-none text-green-600 dark:text-green-300" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 010 1.415l-7.25 7.25a1 1 0 01-1.415 0l-3.25-3.25a1 1 0 111.415-1.415l2.542 2.543 6.543-6.543a1 1 0 011.415 0z" clip-rule="evenodd" />
-                                            </svg>
-                                        </button>
-                                    @endforeach
-                                </div>
-
-                                <div class="flex items-center justify-between gap-3 border-t border-zinc-200 px-4 py-3 text-xs dark:border-zinc-700 dark:bg-zinc-900">
-                                    <button type="button" @click="resetColumns()" class="font-medium text-green-600 transition-colors hover:text-green-700 dark:text-green-400 dark:hover:text-green-300">
-                                        Reset semua
+                            <div class="space-y-2 p-3">
+                                @foreach ($filterableColumns as $key => $label)
+                                    <button
+                                        type="button"
+                                        @click="columns.{{ $key }} = !columns.{{ $key }}"
+                                        class="flex w-full items-center justify-between rounded-md border px-3 py-2 text-sm transition-colors"
+                                        :class="columns.{{ $key }} ? 'border-green-500 bg-green-50 text-green-700 dark:border-green-500 dark:bg-green-900/25 dark:text-green-300' : 'border-zinc-300 bg-white text-gray-700 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700'"
+                                    >
+                                        <span class="whitespace-nowrap">{{ $label }}</span>
+                                        <svg x-show="columns.{{ $key }}" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-none text-green-600 dark:text-green-300" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 010 1.415l-7.25 7.25a1 1 0 01-1.415 0l-3.25-3.25a1 1 0 111.415-1.415l2.542 2.543 6.543-6.543a1 1 0 011.415 0z" clip-rule="evenodd" />
+                                        </svg>
                                     </button>
-                                    <button type="button" @click="open = false" class="font-medium text-gray-500 transition-colors hover:text-gray-700 dark:text-zinc-400 dark:hover:text-zinc-200">
-                                        Tutup
-                                    </button>
-                                </div>
+                                @endforeach
+                            </div>
+
+                            <div class="flex items-center justify-between gap-3 border-t border-zinc-200 px-4 py-3 text-xs dark:border-zinc-700 dark:bg-zinc-900">
+                                <button type="button" @click="resetColumns()" class="font-medium text-green-600 transition-colors hover:text-green-700 dark:text-green-400 dark:hover:text-green-300">
+                                    Reset semua
+                                </button>
+                                <button type="button" @click="open = false" class="font-medium text-gray-500 transition-colors hover:text-gray-700 dark:text-zinc-400 dark:hover:text-zinc-200">
+                                    Tutup
+                                </button>
                             </div>
                         </div>
-
-                        <a href="{{ route('doc.create') }}" class="inline-flex items-center justify-center rounded-md bg-green-600 px-4 py-2 text-white text-sm font-semibold hover:bg-green-700 transition-colors whitespace-nowrap">
-                            +
-                        </a>
                     </div>
+
+                    <a href="{{ route('doc.create') }}" class="inline-flex h-[38px] w-[38px] flex-shrink-0 items-center justify-center rounded-md bg-green-600 text-white font-semibold hover:bg-green-700 transition-colors" title="Tambah Dokumen">
+                        +
+                    </a>
                 </div>
             </div>
 
             {{-- Panel Konten --}}
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm"
-                 style="border-radius: 0 12px 12px 12px;">
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm rounded-xl mt-4">
                 <div class="p-3 text-gray-900 dark:text-zinc-100">
                     @if ($reminders->isNotEmpty())
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-zinc-100 mb-4">Data Tersimpan</h3>

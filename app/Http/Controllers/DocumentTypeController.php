@@ -36,7 +36,10 @@ class DocumentTypeController extends Controller
                 Rule::unique('document_types', 'nama_jenis'),
             ],
             'status' => ['required', Rule::in(['active', 'deactive'])],
+            'tipe_form' => ['nullable', 'string', Rule::in(['default', 'sertifikat', 'wajib_lapor_tahunan', 'slo', 'legalitas'])],
         ]);
+
+        $validated['tipe_form'] = empty($validated['tipe_form']) ? 'default' : $validated['tipe_form'];
 
         DocumentType::create($validated + [
             'created_by' => $request->user()->id,
@@ -63,7 +66,10 @@ class DocumentTypeController extends Controller
                 Rule::unique('document_types', 'nama_jenis')->ignore($doc_type->id),
             ],
             'status' => ['required', Rule::in(['active', 'deactive'])],
+            'tipe_form' => ['nullable', 'string', Rule::in(['default', 'sertifikat', 'wajib_lapor_tahunan', 'slo', 'legalitas'])],
         ]);
+
+        $validated['tipe_form'] = empty($validated['tipe_form']) ? 'default' : $validated['tipe_form'];
 
         $doc_type->update($validated);
 

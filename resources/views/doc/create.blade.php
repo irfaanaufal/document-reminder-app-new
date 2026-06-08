@@ -33,6 +33,35 @@
                             </select>
                         </div>
 
+                        <!-- Form Default -->
+                        <div id="form-default" class="space-y-6 hidden">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div>
+                                    <x-input-label for="nama_default" :value="__('Nama Dokumen')" />
+                                    <x-text-input id="nama_default" name="nama_dokumen" type="text" class="mt-1 block w-full" :value="old('nama_dokumen')" placeholder="Masukkan nama dokumen" />
+                                </div>
+                                <div>
+                                    <x-input-label for="no_default" :value="__('No Dokumen')" />
+                                    <x-text-input id="no_default" name="no_dokumen" type="text" class="mt-1 block w-full" :value="old('no_dokumen')" placeholder="Masukkan nomor dokumen" />
+                                </div>
+                                <div>
+                                    <x-input-label for="penerbit_tujuan_default" :value="__('Penerbit Dokumen')" />
+                                    <x-text-input id="penerbit_tujuan_default" name="penerbit_tujuan" type="text" class="mt-1 block w-full" :value="old('penerbit_tujuan')" placeholder="Masukkan nama penerbit" />
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <x-input-label for="tanggal_terbit_default" :value="__('Tanggal Terbit')" />
+                                    <x-text-input id="tanggal_terbit_default" name="tanggal_terbit" type="date" class="mt-1 block w-full" :value="old('tanggal_terbit')" />
+                                </div>
+                                <div>
+                                    <x-input-label for="tanggal_expired_default" :value="__('Tanggal Expired')" />
+                                    <x-text-input id="tanggal_expired_default" name="tanggal_expired" type="date" class="mt-1 block w-full" :value="old('tanggal_expired')" />
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Form Sertifikat -->
                         <div id="form-sertifikat" class="space-y-6 hidden">
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -45,7 +74,7 @@
                                     <x-text-input id="no_dokumen" name="no_dokumen" type="text" class="mt-1 block w-full" :value="old('no_dokumen')" placeholder="Masukkan nomor dokumen" />
                                 </div>
                                 <div>
-                                    <x-input-label for="penerbit_tujuan" :value="__('Penerbit')" />
+                                    <x-input-label for="penerbit_tujuan" :value="__('Penerbit Sertifikat')" />
                                     <x-text-input id="penerbit_tujuan" name="penerbit_tujuan" type="text" class="mt-1 block w-full" :value="old('penerbit_tujuan')" placeholder="Masukkan nama penerbit" />
                                 </div>
                             </div>
@@ -87,6 +116,64 @@
                                 <div>
                                     <x-input-label for="batas_pengiriman" :value="__('Tanggal Expired')" />
                                     <x-text-input id="batas_pengiriman" name="tanggal_expired" type="date" class="mt-1 block w-full" :value="old('tanggal_expired')" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form SLO -->
+                        <div id="form-slo" class="space-y-6 hidden">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div>
+                                    <x-input-label for="nama_slo" :value="__('Nama SLO')" />
+                                    <x-text-input id="nama_slo" name="nama_dokumen" type="text" class="mt-1 block w-full" :value="old('nama_dokumen')" placeholder="Masukkan nama SLO" />
+                                </div>
+                                <div>
+                                    <x-input-label for="tahun_slo" :value="__('No SLO')" />
+                                    <x-text-input id="tahun_slo" name="no_dokumen" type="text" class="mt-1 block w-full" :value="old('no_dokumen')" placeholder="Masukkan nomor SLO" />
+                                </div>
+                                <div>
+                                    <x-input-label for="instansi_slo" :value="__('Penerbit SLO')" />
+                                    <x-text-input id="instansi_slo" name="penerbit_tujuan" type="text" class="mt-1 block w-full" :value="old('penerbit_tujuan')" placeholder="Masukkan nama penerbit SLO" />
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <x-input-label for="tanggal_terbit_slo" :value="__('Tanggal Terbit')" />
+                                    <x-text-input id="tanggal_terbit_slo" name="tanggal_terbit" type="date" class="mt-1 block w-full" :value="old('tanggal_terbit')" />
+                                </div>
+                                <div>
+                                    <x-input-label for="batas_pengiriman_slo" :value="__('Tanggal Expired')" />
+                                    <x-text-input id="batas_pengiriman_slo" name="tanggal_expired" type="date" class="mt-1 block w-full" :value="old('tanggal_expired')" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Legalitas -->
+                        <div id="form-legalitas" class="space-y-6 hidden">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div>
+                                    <x-input-label for="nama_legalitas" :value="__('Nama Legalitas')" />
+                                    <x-text-input id="nama_legalitas" name="nama_dokumen" type="text" class="mt-1 block w-full" :value="old('nama_dokumen')" placeholder="Masukkan nama legalitas" />
+                                </div>
+                                <div>
+                                    <x-input-label for="no_legalitas" :value="__('No Legalitas')" />
+                                    <x-text-input id="no_legalitas" name="no_dokumen" type="text" class="mt-1 block w-full" :value="old('no_dokumen')" placeholder="Masukkan nomor legalitas" />
+                                </div>
+                                <div>
+                                    <x-input-label for="instansi_legalitas" :value="__('Penerbit Legalitas')" />
+                                    <x-text-input id="instansi_legalitas" name="penerbit_tujuan" type="text" class="mt-1 block w-full" :value="old('penerbit_tujuan')" placeholder="Masukkan nama penerbit legalitas" />
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <x-input-label for="tanggal_terbit_legalitas" :value="__('Tanggal Terbit')" />
+                                    <x-text-input id="tanggal_terbit_legalitas" name="tanggal_terbit" type="date" class="mt-1 block w-full" :value="old('tanggal_terbit')" />
+                                </div>
+                                <div>
+                                    <x-input-label for="batas_pengiriman_legalitas" :value="__('Tanggal Expired')" />
+                                    <x-text-input id="batas_pengiriman_legalitas" name="tanggal_expired" type="date" class="mt-1 block w-full" :value="old('tanggal_expired')" />
                                 </div>
                             </div>
                         </div>
@@ -182,10 +269,13 @@
             const selectedOption = selectElement.options[selectElement.selectedIndex];
             const tipeForm = selectedOption ? selectedOption.getAttribute('data-tipe-form') : null;
 
+            const formDefault = document.getElementById('form-default');
             const formSertifikat = document.getElementById('form-sertifikat');
             const formWajibLapor = document.getElementById('form-wajib-lapor-tahunan');
+            const formSLO = document.getElementById('form-slo');
+            const formLegalitas = document.getElementById('form-legalitas');
 
-            [formSertifikat, formWajibLapor].forEach(form => {
+            [formDefault, formSertifikat, formWajibLapor, formSLO, formLegalitas].forEach(form => {
                 form.classList.add('hidden');
                 form.querySelectorAll('input, select').forEach(el => el.disabled = true);
             });
@@ -196,6 +286,15 @@
             } else if (tipeForm === 'wajib_lapor_tahunan') {
                 formWajibLapor.classList.remove('hidden');
                 formWajibLapor.querySelectorAll('input, select').forEach(el => el.disabled = false);
+            } else if (tipeForm === 'slo') {
+                formSLO.classList.remove('hidden');
+                formSLO.querySelectorAll('input, select').forEach(el => el.disabled = false);
+            } else if (tipeForm === 'legalitas') {
+                formLegalitas.classList.remove('hidden');
+                formLegalitas.querySelectorAll('input, select').forEach(el => el.disabled = false);
+            } else {
+                formDefault.classList.remove('hidden');
+                formDefault.querySelectorAll('input, select').forEach(el => el.disabled = false);
             }
         }
 

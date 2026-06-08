@@ -306,11 +306,7 @@ Route::middleware(['auth', 'verified', 'role:1,2,3'])->group(function () {
     Route::get('/dokumen', function () {
         $today = now();
         $jenis = request()->string('jenis')->toString();
-        $allowedJenis = ['sertifikat', 'spt'];
-        $jenisMap = [
-            'sertifikat' => 'sertifikat',
-            'spt' => 'wajib lapor tahunan',
-        ];
+        $documentTypes = DocumentType::where('status', 'active')->orderBy('nama_jenis')->get();
 
         $remindersQuery = DocumentReminder::with(['user', 'documentType', 'internalPics']);
 
@@ -340,14 +336,24 @@ Route::middleware(['auth', 'verified', 'role:1,2,3'])->group(function () {
             $remindersToNotify = $buildRemindersToNotify($remindersQuery->get());
         }
 
-        if (in_array($jenis, $allowedJenis, true)) {
-            $targetJenis = $jenisMap[$jenis];
-
-            $remindersQuery->where(function ($query) use ($targetJenis) {
-                $query->where('jenis_dokumen', $targetJenis)
-                    ->orWhereHas('documentType', function ($documentTypeQuery) use ($targetJenis) {
-                        $documentTypeQuery->where('nama_jenis', $targetJenis);
-                    });
+        if ($jenis !== '' && $jenis !== 'semua') {
+            $remindersQuery->where(function ($query) use ($jenis) {
+                if (is_numeric($jenis)) {
+                    $query->where('jenis_dokumen', $jenis);
+                    $docType = DocumentType::find($jenis);
+                    if ($docType) {
+                        $query->orWhere('jenis_dokumen', $docType->nama_jenis);
+                    }
+                } else {
+                    $targetJenis = $jenis;
+                    if ($jenis === 'spt') {
+                        $targetJenis = 'wajib lapor tahunan';
+                    }
+                    $query->where('jenis_dokumen', $targetJenis)
+                        ->orWhereHas('documentType', function ($documentTypeQuery) use ($targetJenis) {
+                            $documentTypeQuery->where('nama_jenis', $targetJenis);
+                        });
+                }
             });
         }
 
@@ -364,6 +370,7 @@ Route::middleware(['auth', 'verified', 'role:1,2,3'])->group(function () {
             'reminders' => $reminders,
             'jenis' => $jenis,
             'remindersToNotify' => $remindersToNotify,
+            'documentTypes' => $documentTypes,
         ]);
     })->name('dokumen');
     Route::get('/dokumen/create', [DocumentReminderController::class, 'create'])->name('doc.create');

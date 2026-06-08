@@ -34,8 +34,20 @@
                         </select>
                     </div>
 
+                    <div>
+                        <label for="tipe_form" class="block text-sm font-medium text-gray-700 dark:text-zinc-300">Tipe Form Input</label>
+                        <select id="tipe_form" name="tipe_form" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
+                            <option value="">Pilih Tipe Form (Default)</option>
+                            <option value="default" @selected(old('tipe_form', $documentType->tipe_form) === 'default')>Default</option>
+                            <option value="sertifikat" @selected(old('tipe_form', $documentType->tipe_form) === 'sertifikat')>Sertifikat</option>
+                            <option value="wajib_lapor_tahunan" @selected(old('tipe_form', $documentType->tipe_form) === 'wajib_lapor_tahunan')>Wajib Lapor Tahunan</option>
+                            <option value="slo" @selected(old('tipe_form', $documentType->tipe_form) === 'slo')>SLO</option>
+                            <option value="legalitas" @selected(old('tipe_form', $documentType->tipe_form) === 'legalitas')>Legalitas</option>
+                        </select>
+                    </div>
+
                     <div class="flex items-center gap-3 border-t border-gray-200 pt-4 dark:border-zinc-800">
-                        <button type="submit" class="inline-flex items-center rounded-md bg-blue-600 px-6 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors">Simpan Perubahan</button>
+                        <button type="submit" class="inline-flex items-center rounded-md bg-green-600 px-6 py-2 text-sm font-semibold text-white hover:bg-green-700 transition-colors">Simpan</button>
                         <a href="{{ route('doc_type.index') }}" class="inline-flex items-center rounded-md bg-red-600 px-6 py-2 text-sm font-semibold text-white hover:bg-red-700 transition-colors">Batal</a>
                     </div>
                 </form>
