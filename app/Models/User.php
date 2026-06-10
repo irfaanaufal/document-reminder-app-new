@@ -97,4 +97,9 @@ class User extends Authenticatable
     {
         return (bool) $this->can_use_chatbot;
     }
+
+    public function chatSessions(): HasMany
+    {
+        return $this->hasMany(ChatSession::class);
+    }
 }

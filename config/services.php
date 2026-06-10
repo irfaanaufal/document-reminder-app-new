@@ -41,10 +41,10 @@ return [
         'sender' => env('FONNTE_SENDER'),
     ],
 
-    'gemini' => [
-        'api_key' => env('GEMINI_API_KEY'),
-        'model' => env('GEMINI_MODEL', 'gemini-1.5-flash'),
-        'base_url' => env('GEMINI_BASE_URL', 'https://generativelanguage.googleapis.com/v1beta/models'),
+    'chatgpt' => [
+        'api_key' => env('CHATGPT_API_KEY'),
+        'model' => env('CHATGPT_MODEL', 'gpt-4o-mini'),
+        'base_url' => env('CHATGPT_BASE_URL', 'https://api.openai.com/v1'),
     ],
 
 ];

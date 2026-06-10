@@ -18,8 +18,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/chatbot', [ChatbotController::class, 'index'])->name('chatbot.index');
-Route::post('/chatbot/send', [ChatbotController::class, 'sendMessage'])->name('chatbot.send');
+
 
 Route::get('/dashboard', function () {
     $today = now();
@@ -300,6 +299,9 @@ Route::middleware(['auth', 'verified', 'role:3'])->group(function () {
 });
 
 Route::middleware(['auth', 'verified', 'role:1,2,3'])->group(function () {
+    Route::get('/chatbot', [ChatbotController::class, 'index'])->name('chatbot.index');
+    Route::post('/chatbot/send', [ChatbotController::class, 'sendMessage'])->name('chatbot.send');
+
     Route::get('/doc-type', [DocumentTypeController::class, 'index'])->name('doc_type.index');
     Route::get('/doc-type/create', [DocumentTypeController::class, 'create'])->name('doc_type.create');
     Route::post('/doc-type', [DocumentTypeController::class, 'store'])->name('doc_type.store');
