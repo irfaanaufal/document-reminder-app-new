@@ -118,7 +118,7 @@ class DocumentReminderController extends Controller
             'pic_nama' => ['nullable', 'string', 'max:255'],
             'pic_telpon' => ['nullable', 'string', 'max:20'],
             'pic_external_nama' => ['nullable', 'string', 'max:255'],
-            'pic_external_telpon' => ['nullable', 'string', 'max:20'],
+            'pic_external_telpon' => ['nullable', 'string', 'max:15', 'regex:/^[0-9]+$/'],
             'penerbit_tujuan' => ['required', 'string', 'max:255'],
             'tanggal_terbit' => ['required', 'date'],
             'tanggal_expired' => ['required', 'date', 'after_or_equal:tanggal_terbit'],

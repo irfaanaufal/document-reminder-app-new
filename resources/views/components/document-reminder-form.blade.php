@@ -68,7 +68,7 @@
 
                 <div>
                     <label for="pic_external_telpon" class="block text-sm font-medium text-gray-700">No. Telpon PIC External <span class="text-xs text-gray-500">(opsional)</span></label>
-                    <input id="pic_external_telpon" name="pic_external_telpon" type="text" value="{{ old('pic_external_telpon') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <input id="pic_external_telpon" name="pic_external_telpon" type="text" value="{{ old('pic_external_telpon') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" maxlength="15" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 </div>
             </div>
 

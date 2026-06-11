@@ -221,7 +221,7 @@
                                     </div>
                                     <div>
                                         <x-input-label for="pic_external_telpon" :value="__('No Telp PIC External')" />
-                                        <x-text-input name="pic_external_telpon" type="tel" class="mt-1 block w-full" :value="old('pic_external_telpon')" />
+                                        <x-text-input id="pic_external_telpon" name="pic_external_telpon" type="tel" class="mt-1 block w-full" :value="old('pic_external_telpon')" maxlength="15" oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
                                     </div>
                                 </div>
                             </div>
