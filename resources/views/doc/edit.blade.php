@@ -142,7 +142,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <x-input-label for="tanggal_terbit_slo" :value="__('Tanggal Terbit')" />
-                                    <x-text-input id="tanggal_terbit_slo" name="tanggal_terbit" type="date" class="mt-1 block w-full" :value="old('tanggal_terbit', $reminder->tanggal_expired->format('Y-m-d'))" />
+                                    <x-text-input id="tanggal_terbit_slo" name="tanggal_terbit" type="date" class="mt-1 block w-full" :value="old('tanggal_terbit', $reminder->tanggal_terbit->format('Y-m-d'))" />
                                 </div>
                                 <div>
                                     <x-input-label for="batas_pengiriman_slo" :value="__('Tanggal Expired')" />
