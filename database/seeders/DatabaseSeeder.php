@@ -19,9 +19,10 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::updateOrCreate([
-            'email' => 'irfaan@gmail.com',
+            'username' => 'irfaan',
         ], [
             'nama' => 'Irfaan',
+            'email' => 'irfaan@gmail.com',
             'password' => Hash::make('password'),
             'no_telpon' => '082353575812',
             'role' => User::ROLE_SUPER_ADMIN,
@@ -29,45 +30,14 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::updateOrCreate([
-            'email' => 'hadi@gmail.com',
-        ], [
-            'nama' => 'Hadi',
-            'password' => Hash::make('password'),
-            'no_telpon' => '083817422225',
-            'role' => User::ROLE_SUPER_ADMIN,
-            'is_active' => true,
-        ]);
-
-        User::updateOrCreate([
-            'email' => 'hendi@gmail.com',
+            'username' => 'hendi',
         ], [
             'nama' => 'Hendi',
+            'email' => 'hendi@gmail.com',
             'password' => Hash::make('password'),
             'no_telpon' => '081902588715',
             'role' => User::ROLE_SUPER_ADMIN,
             'is_active' => true,
         ]);
-        
-        User::updateOrCreate([
-            'email' => 'admin@gmail.com',
-        ], [
-            'nama' => 'Admin Demo',
-            'password' => Hash::make('password'),
-            'no_telpon' => '087712733183',
-            'role' => User::ROLE_ADMIN,
-            'is_active' => true,
-        ]);
-
-        User::updateOrCreate([
-            'email' => 'user@gmail.com',
-        ], [
-            'nama' => 'User Demo',
-            'password' => Hash::make('password'),
-            'no_telpon' => '087712733183',
-            'role' => User::ROLE_USER,
-            'is_active' => true,
-        ]);
-
-        $this->call(DocumentReminderSeeder::class);
     }
 }

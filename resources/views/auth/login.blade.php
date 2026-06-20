@@ -11,14 +11,14 @@
             <div id="signin-section" class="w-full h-full min-h-[640px] flex flex-col justify-center items-center px-8 py-10 sm:px-16 bg-white transition-all duration-500">
                 <h2 class="text-3xl font-bold text-slate-900 tracking-tight">Log In</h2>
 
-                <span class="text-xs text-slate-400 mt-4 tracking-wide">Gunakan email dan kata sandi Anda</span>
+                <span class="text-xs text-slate-400 mt-4 tracking-wide">Gunakan username dan kata sandi Anda</span>
                 <x-auth-session-status class="mt-4 text-xs" :status="session('status')" />
 
                 <form method="POST" action="{{ route('login') }}" class="w-full mt-4 space-y-4">
                     @csrf
                     <div>
-                        <input type="email" name="email" :value="old('email')" required autofocus placeholder="Alamat Email" class="w-full px-4 py-3 bg-slate-100 border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-600/20 transition-all text-slate-800" />
-                        <x-input-error :messages="$errors->get('email')" class="mt-1 text-xs" />
+                        <input type="text" name="username" :value="old('username')" required autofocus placeholder="Username" class="w-full px-4 py-3 bg-slate-100 border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-600/20 transition-all text-slate-800" />
+                        <x-input-error :messages="$errors->get('username')" class="mt-1 text-xs" />
                     </div>
                     <div>
                         <input type="password" name="password" required placeholder="Kata Sandi" class="w-full px-4 py-3 bg-slate-100 border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-600/20 transition-all text-slate-800" />
@@ -52,6 +52,10 @@
                     <div>
                         <input type="text" name="nama" :value="old('nama')" required placeholder="Nama Lengkap" class="w-full px-4 py-3 bg-slate-100 border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-600/20 transition-all text-slate-800" />
                         <x-input-error :messages="$errors->get('nama')" class="mt-1 text-xs" />
+                    </div>
+                    <div>
+                        <input type="text" name="username" :value="old('username')" required placeholder="Username" class="w-full px-4 py-3 bg-slate-100 border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-600/20 transition-all text-slate-800" />
+                        <x-input-error :messages="$errors->get('username')" class="mt-1 text-xs" />
                     </div>
                     <div>
                         <input type="email" name="email" :value="old('email')" required placeholder="Alamat Email" class="w-full px-4 py-3 bg-slate-100 border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-600/20 transition-all text-slate-800" />
@@ -154,7 +158,7 @@
             }
         }
 
-        @if($errors->has('nama') || $errors->has('no_telpon') || (old('nama') && !$errors->has('email')))
+        @if($errors->has('nama') || $errors->has('username') || $errors->has('no_telpon') || (old('nama') && !$errors->has('email')))
             window.addEventListener('DOMContentLoaded', () => toggleAuthMode(true));
         @endif
     </script>

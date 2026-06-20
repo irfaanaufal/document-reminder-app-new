@@ -68,6 +68,7 @@
                                 </td>
                                 <td class="px-4 py-3 text-gray-900 dark:text-zinc-100">
                                     <div class="font-medium">{{ $account->nama }}</div>
+                                    <div class="text-xs text-gray-400">@<span>{{ $account->username }}</span></div>
                                 </td>
                                 <td class="px-4 py-3 text-gray-600 dark:text-zinc-300">{{ $account->email }}</td>
                                 <td class="px-4 py-3">
