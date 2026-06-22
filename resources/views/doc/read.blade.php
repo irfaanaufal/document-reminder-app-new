@@ -342,9 +342,11 @@
                                                             </button>
                                                         </form>
                                                     @endcan
-                                                    <a href="{{ route('doc.show', $reminder->id) }}" class="text-emerald-500 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 transition-colors" title="Lihat Detail">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 3.75c-3.69 0-6.86 2.29-8.28 5.54a1 1 0 000 .92C3.14 13.46 6.31 15.75 10 15.75s6.86-2.29 8.28-5.54a1 1 0 000-.92C16.86 6.04 13.69 3.75 10 3.75zm0 8.5A2.25 2.25 0 1 1 10 7.5a2.25 2.25 0 0 1 0 4.75z" /></svg>
-                                                    </a>
+                                                    @if(!auth()->user()->isUser())
+                                                        <a href="{{ route('doc.show', $reminder->id) }}" class="text-emerald-500 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 transition-colors" title="Lihat Detail">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 3.75c-3.69 0-6.86 2.29-8.28 5.54a1 1 0 000 .92C3.14 13.46 6.31 15.75 10 15.75s6.86-2.29 8.28-5.54a1 1 0 000-.92C16.86 6.04 13.69 3.75 10 3.75zm0 8.5A2.25 2.25 0 1 1 10 7.5a2.25 2.25 0 0 1 0 4.75z" /></svg>
+                                                        </a>
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>
