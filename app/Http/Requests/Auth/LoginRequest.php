@@ -57,7 +57,7 @@ class LoginRequest extends FormRequest
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'username' => 'Akun Anda sedang nonaktif. Hubungi super admin.',
+                'username' => 'Akun Anda perlu diaktifkan. Silahkan hubungi Team IT untuk diaktifkan.',
             ]);
         }
 

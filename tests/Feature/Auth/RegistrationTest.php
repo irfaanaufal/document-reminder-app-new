@@ -9,11 +9,19 @@ test('registration screen can be rendered', function () {
 test('new users can register', function () {
     $response = $this->post('/register', [
         'nama' => 'Test User',
+        'username' => 'testuser',
         'email' => 'test@example.com',
+        'no_telpon' => '081234567890',
         'password' => 'password',
         'password_confirmation' => 'password',
     ]);
 
-    $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $this->assertGuest();
+    $response->assertRedirect(route('login'));
+    $response->assertSessionHas('status', 'hubungi super admin untuk approved');
+
+    $this->assertDatabaseHas('users', [
+        'email' => 'test@example.com',
+        'is_active' => false,
+    ]);
 });

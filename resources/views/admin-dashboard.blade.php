@@ -106,7 +106,7 @@
                         return 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300';
                     }
 
-                    if (state === 'green') {
+                    if (state === 'green' || state === 'lifetime') {
                         return 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300';
                     }
 
@@ -177,7 +177,7 @@
                                 <span class="hidden sm:block" x-text="selectedDocuments.length ? `${selectedDocuments.length} dokumen terkait` : 'Klik tanggal yang memiliki indikator'"></span>
                             </div>
                         </div>
-                            <span class="rounded-full px-2.5 py-1 text-[10px] font-semibold lg:px-3 lg:text-[11px]" :class="getSelectedDay() ? statusClass(getSelectedDay().state) : 'bg-gray-100 text-gray-500 dark:bg-zinc-800 dark:text-zinc-300'" x-text="getSelectedDay() ? (getSelectedDay().state === 'expired' ? 'Expired' : (getSelectedDay().state === 'red' || getSelectedDay().state === 'yellow' ? 'Mendekati expired' : (getSelectedDay().state === 'green' ? 'Reminder aktif' : 'Tidak ada indikator'))) : 'Belum dipilih'"></span>
+                            <span class="rounded-full px-2.5 py-1 text-[10px] font-semibold lg:px-3 lg:text-[11px]" :class="getSelectedDay() ? statusClass(getSelectedDay().state) : 'bg-gray-100 text-gray-500 dark:bg-zinc-800 dark:text-zinc-300'" x-text="getSelectedDay() ? (getSelectedDay().state === 'expired' ? 'Expired' : (getSelectedDay().state === 'lifetime' ? 'Seumur Hidup' : (getSelectedDay().state === 'red' || getSelectedDay().state === 'yellow' ? 'Mendekati expired' : (getSelectedDay().state === 'green' ? 'Reminder aktif' : 'Tidak ada indikator')))) : 'Belum dipilih'"></span>
                     </div>
 
                     <div class="mt-3 space-y-2 lg:mt-4 lg:space-y-3">
@@ -195,7 +195,7 @@
                                     </div>
                                     <div class="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-gray-500 dark:text-zinc-400 lg:mt-3 lg:gap-3 lg:text-xs">
                                         <span>Expired: <span class="font-medium text-gray-700 dark:text-zinc-200" x-text="document.expired_at"></span></span>
-                                        <span x-show="document.days_left >= 0">Sisa hari: <span class="font-medium text-gray-700 dark:text-zinc-200" x-text="document.days_left"></span></span>
+                                        <span x-show="document.days_left !== null && document.days_left >= 0">Sisa hari: <span class="font-medium text-gray-700 dark:text-zinc-200" x-text="document.days_left"></span></span>
                                     </div>
                                 </div>
                             </template>

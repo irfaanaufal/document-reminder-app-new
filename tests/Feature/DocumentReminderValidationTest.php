@@ -92,3 +92,33 @@ test('document validation passes when pic_external_telpon is valid and max 15 di
 
     $response->assertSessionHasNoErrors();
 });
+
+test('document validation passes when tanggal_expired and reminder_bulan are null', function () {
+    $user = User::factory()->create(['no_telpon' => '081234567890']);
+    $documentType = DocumentType::create([
+        'nama_jenis' => 'Sertifikat Lifetime',
+        'status' => 'active',
+        'created_by' => $user->id,
+        'tipe_form' => 'default',
+    ]);
+
+    Storage::fake('public');
+
+    $response = $this->actingAs($user)->post('/document-reminders', [
+        'nama_dokumen' => 'Dokumen Test Lifetime',
+        'no_dokumen' => '123/LIFETIME/2026',
+        'jenis_dokumen' => $documentType->id,
+        'penerbit_tujuan' => 'Instansi Test',
+        'tanggal_terbit' => '2026-01-01',
+        'tanggal_expired' => null,
+        'reminder_bulan' => null,
+        'attachment' => UploadedFile::fake()->create('document.pdf', 100),
+    ]);
+
+    $response->assertSessionHasNoErrors();
+    $this->assertDatabaseHas('document_reminders', [
+        'nama_dokumen' => 'Dokumen Test Lifetime',
+        'tanggal_expired' => null,
+        'reminder_bulan' => null,
+    ]);
+});

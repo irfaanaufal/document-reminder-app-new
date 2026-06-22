@@ -8,35 +8,43 @@
     @php
         $today = \Carbon\Carbon::today();
         $expired = $reminder->tanggal_expired;
-        $sisaHari = $today->diffInDays($expired, false);
         $ext = strtolower(pathinfo($reminder->attachment_name ?? '', PATHINFO_EXTENSION));
         $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
 
-        if ($sisaHari < 0) {
-            $statusLabel = 'Expired';
-            $statusColor = 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
-            $sisaHariText = 'Sudah lewat ' . abs($sisaHari) . ' hari';
-            $sisaHariColor = 'text-red-600 dark:text-red-400';
-        } elseif ($sisaHari == 0) {
-            $statusLabel = 'Expired Hari Ini';
-            $statusColor = 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
-            $sisaHariText = 'Expired hari ini';
-            $sisaHariColor = 'text-red-600 dark:text-red-400';
-        } elseif ($sisaHari <= 30) {
-            $statusLabel = 'Segera Expired';
-            $statusColor = 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
-            $sisaHariText = $sisaHari . ' hari lagi';
-            $sisaHariColor = 'text-amber-600 dark:text-amber-400';
-        } elseif ($sisaHari <= 90) {
-            $statusLabel = 'Perlu Perhatian';
-            $statusColor = 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
-            $sisaHariText = $sisaHari . ' hari lagi';
-            $sisaHariColor = 'text-yellow-600 dark:text-yellow-400';
-        } else {
+        if (is_null($expired)) {
             $statusLabel = 'Aktif';
-            $statusColor = 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
-            $sisaHariText = $sisaHari . ' hari lagi';
-            $sisaHariColor = 'text-green-600 dark:text-green-400';
+            $statusColor = 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400';
+            $sisaHariText = 'Seumur Hidup';
+            $sisaHariColor = 'text-emerald-600 dark:text-emerald-400';
+        } else {
+            $sisaHari = $today->diffInDays($expired, false);
+
+            if ($sisaHari < 0) {
+                $statusLabel = 'Expired';
+                $statusColor = 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
+                $sisaHariText = 'Sudah lewat ' . abs($sisaHari) . ' hari';
+                $sisaHariColor = 'text-red-600 dark:text-red-400';
+            } elseif ($sisaHari == 0) {
+                $statusLabel = 'Expired Hari Ini';
+                $statusColor = 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
+                $sisaHariText = 'Expired hari ini';
+                $sisaHariColor = 'text-red-600 dark:text-red-400';
+            } elseif ($sisaHari <= 30) {
+                $statusLabel = 'Segera Expired';
+                $statusColor = 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
+                $sisaHariText = $sisaHari . ' hari lagi';
+                $sisaHariColor = 'text-amber-600 dark:text-amber-400';
+            } elseif ($sisaHari <= 90) {
+                $statusLabel = 'Perlu Perhatian';
+                $statusColor = 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
+                $sisaHariText = $sisaHari . ' hari lagi';
+                $sisaHariColor = 'text-yellow-600 dark:text-yellow-400';
+            } else {
+                $statusLabel = 'Aktif';
+                $statusColor = 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
+                $sisaHariText = $sisaHari . ' hari lagi';
+                $sisaHariColor = 'text-green-600 dark:text-green-400';
+            }
         }
     @endphp
 
@@ -74,7 +82,7 @@
                         </div>
                         <div class="text-right">
                             <p class="text-sm text-gray-500 dark:text-zinc-400">Expired pada</p>
-                            <p class="mt-1 text-lg font-semibold text-gray-900 dark:text-zinc-100">{{ $expired->translatedFormat('d F Y') }}</p>
+                            <p class="mt-1 text-lg font-semibold text-gray-900 dark:text-zinc-100">{{ $expired ? $expired->translatedFormat('d F Y') : 'Seumur Hidup' }}</p>
                         </div>
                     </div>
                 </div>
@@ -105,11 +113,11 @@
                         </div>
                         <div>
                             <dt class="text-sm font-medium text-gray-500 dark:text-zinc-400">Tanggal Expired</dt>
-                            <dd class="mt-1 text-sm font-semibold text-gray-900 dark:text-zinc-100">{{ $expired->translatedFormat('d F Y') }}</dd>
+                            <dd class="mt-1 text-sm font-semibold text-gray-900 dark:text-zinc-100">{{ $expired ? $expired->translatedFormat('d F Y') : 'Seumur Hidup' }}</dd>
                         </div>
                         <div>
                             <dt class="text-sm font-medium text-gray-500 dark:text-zinc-400">Interval Reminder</dt>
-                            <dd class="mt-1 text-sm font-semibold text-gray-900 dark:text-zinc-100">{{ $reminder->reminder_bulan }} bulan sebelum expired</dd>
+                            <dd class="mt-1 text-sm font-semibold text-gray-900 dark:text-zinc-100">{{ $reminder->reminder_bulan ? $reminder->reminder_bulan . ' bulan sebelum expired' : 'Tidak ada reminder' }}</dd>
                         </div>
                         <div>
                             <dt class="text-sm font-medium text-gray-500 dark:text-zinc-400">Dibuat Oleh</dt>

@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('nama_dokumen');
             $table->date('tanggal_terbit');
-            $table->date('tanggal_expired');
-            $table->unsignedTinyInteger('reminder_bulan');
+            $table->date('tanggal_expired')->nullable();
+            $table->unsignedTinyInteger('reminder_bulan')->nullable();
             $table->string('attachment_path');
             $table->string('attachment_name');
             $table->timestamps();

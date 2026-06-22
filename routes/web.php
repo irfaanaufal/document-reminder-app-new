@@ -41,6 +41,9 @@ Route::get('/dashboard', function () {
 
     $buildRemindersToNotify = function ($reminders) use ($today) {
         return $reminders->filter(function ($reminder) use ($today) {
+            if (is_null($reminder->tanggal_expired)) {
+                return false;
+            }
             $todayDate = $today->copy()->startOfDay();
             $expired = $reminder->tanggal_expired->copy()->startOfDay();
             $reminderMonths = (int) $reminder->reminder_bulan;
@@ -51,6 +54,13 @@ Route::get('/dashboard', function () {
     };
 
     $resolveReminderState = function ($reminder) use ($today) {
+        if (is_null($reminder->tanggal_expired)) {
+            return [
+                'state' => 'lifetime',
+                'label' => 'Seumur Hidup',
+                'days_left' => null,
+            ];
+        }
         $daysLeft = $today->copy()->startOfDay()->diffInDays($reminder->tanggal_expired->copy()->startOfDay(), false);
         $reminderMonths = (int) $reminder->reminder_bulan;
         if ($daysLeft < 0) {
@@ -162,7 +172,7 @@ Route::get('/dashboard', function () {
             || str_contains($jenisLabel, 'wajib lapor tahunan');
     })->count();
     $totalExpired = $reminders->filter(function ($reminder) use ($today) {
-        return $reminder->tanggal_expired->lt($today->copy()->startOfDay());
+        return $reminder->tanggal_expired && $reminder->tanggal_expired->lt($today->copy()->startOfDay());
     })->count();
 
     // allow viewing other months via ?month=YYYY-MM
@@ -186,8 +196,8 @@ Route::get('/dashboard', function () {
             'id' => $reminder->id,
             'name' => $reminder->nama_dokumen,
             'type' => $reminder->jenis_dokumen_label,
-            'expired_at' => $reminder->tanggal_expired->format('d-m-Y'),
-            'date_key' => $reminder->tanggal_expired->toDateString(),
+            'expired_at' => $reminder->tanggal_expired ? $reminder->tanggal_expired->format('d-m-Y') : 'Seumur Hidup',
+            'date_key' => $reminder->tanggal_expired ? $reminder->tanggal_expired->toDateString() : 'lifetime',
             'state' => $state['state'],
             'state_label' => $state['label'],
             'days_left' => $state['days_left'],
@@ -318,6 +328,9 @@ Route::middleware(['auth', 'verified', 'role:1,2,3'])->group(function () {
 
         $buildRemindersToNotify = function ($reminders) use ($today) {
             return $reminders->filter(function ($reminder) use ($today) {
+                if (is_null($reminder->tanggal_expired)) {
+                    return false;
+                }
                 $todayDate = $today->copy()->startOfDay();
                 $expired = $reminder->tanggal_expired->copy()->startOfDay();
                 $reminderMonths = (int) $reminder->reminder_bulan;
@@ -369,7 +382,7 @@ Route::middleware(['auth', 'verified', 'role:1,2,3'])->group(function () {
         }
 
         $reminders = $remindersQuery
-            ->orderByRaw('CASE WHEN tanggal_expired < CURDATE() THEN 1 ELSE 0 END ASC, CASE WHEN CURDATE() >= DATE_SUB(tanggal_expired, INTERVAL reminder_bulan MONTH) THEN 0 ELSE 1 END ASC, tanggal_expired ASC')
+            ->orderByRaw('CASE WHEN tanggal_expired IS NULL THEN 1 ELSE 0 END ASC, CASE WHEN tanggal_expired < CURDATE() THEN 1 ELSE 0 END ASC, CASE WHEN CURDATE() >= DATE_SUB(tanggal_expired, INTERVAL reminder_bulan MONTH) THEN 0 ELSE 1 END ASC, tanggal_expired ASC')
             ->get();
 
         return view('doc.read', [

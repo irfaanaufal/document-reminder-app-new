@@ -158,7 +158,7 @@
             }
         }
 
-        @if($errors->has('nama') || $errors->has('username') || $errors->has('no_telpon') || (old('nama') && !$errors->has('email')))
+        @if($errors->has('nama') || $errors->has('email') || $errors->has('no_telpon') || $errors->has('password_confirmation') || old('nama') || old('email') || old('no_telpon'))
             window.addEventListener('DOMContentLoaded', () => toggleAuthMode(true));
         @endif
     </script>

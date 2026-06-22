@@ -121,8 +121,8 @@ class DocumentReminderController extends Controller
             'pic_external_telpon' => ['nullable', 'string', 'max:15', 'regex:/^[0-9]+$/'],
             'penerbit_tujuan' => ['required', 'string', 'max:255'],
             'tanggal_terbit' => ['required', 'date'],
-            'tanggal_expired' => ['required', 'date', 'after_or_equal:tanggal_terbit'],
-            'reminder_bulan' => ['required', Rule::in([1, 3, 6, 9, 12])],
+            'tanggal_expired' => ['nullable', 'date', 'after_or_equal:tanggal_terbit'],
+            'reminder_bulan' => ['nullable', 'required_with:tanggal_expired', Rule::in([1, 3, 6, 9, 12])],
             'attachment' => [$isUpdate ? 'nullable' : 'required', 'file', 'mimes:pdf,png,jpg,jpeg', 'max:3072'],
         ];
     }

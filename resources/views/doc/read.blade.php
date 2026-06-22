@@ -198,12 +198,14 @@
                                     @endphp
                                     @foreach ($reminders as $reminder)
                                         @php
-                                            $isToday = $reminder->tanggal_expired->isSameDay($today);
-                                            $isExpired = $reminder->tanggal_expired->lt($today->copy()->startOfDay()) && ! $isToday;
+                                            $isToday = $reminder->tanggal_expired ? $reminder->tanggal_expired->isSameDay($today) : false;
+                                            $isExpired = $reminder->tanggal_expired ? ($reminder->tanggal_expired->lt($today->copy()->startOfDay()) && ! $isToday) : false;
                                             $reminderMonths = (int) $reminder->reminder_bulan;
-                                            $daysLeft = $today->copy()->startOfDay()->diffInDays($reminder->tanggal_expired->copy()->startOfDay(), false);
+                                            $daysLeft = $reminder->tanggal_expired ? $today->copy()->startOfDay()->diffInDays($reminder->tanggal_expired->copy()->startOfDay(), false) : null;
 
-                                            if ($daysLeft < 0) {
+                                            if (is_null($daysLeft)) {
+                                                $status = 'lifetime';
+                                            } elseif ($daysLeft < 0) {
                                                 $status = 'expired';
                                             } else {
                                                 if ($reminderMonths === 1) {
@@ -252,7 +254,9 @@
                                                 }
                                             }
 
-                                            if ($status === 'expired') {
+                                            if ($status === 'lifetime') {
+                                                $badgeClass = 'inline-flex min-w-20 justify-center rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300';
+                                            } elseif ($status === 'expired') {
                                                 $badgeClass = 'inline-flex min-w-20 justify-center rounded-md bg-gray-400 px-2.5 py-1 text-xs font-semibold text-gray-900 dark:bg-zinc-800 dark:text-zinc-100';
                                             } elseif ($status === 'red') {
                                                 $badgeClass = 'inline-flex min-w-20 justify-center rounded-md bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700 dark:bg-red-900/20 dark:text-red-300';
@@ -265,9 +269,9 @@
                                             }
 
                                             $showBadge = $status !== 'neutral';
-                                            $badgeText = $isToday
-                                                ? 'Hari ini'
-                                                : ($daysLeft > 0 ? ($daysLeft . ' hari lagi') : 'Kadaluarsa');
+                                            $badgeText = $status === 'lifetime'
+                                                ? 'Seumur Hidup'
+                                                : ($isToday ? 'Hari ini' : ($daysLeft > 0 ? ($daysLeft . ' hari lagi') : 'Kadaluarsa'));
                                         @endphp
                                         <tr>
                                             <td x-cloak x-show="columns.nomor" class="px-4 py-3 align-top whitespace-nowrap text-gray-900 dark:text-zinc-100">{{ $loop->iteration }}</td>
@@ -276,7 +280,11 @@
                                                     {{ $reminder->nama_dokumen }}
                                                 </span>
                                             </td>
-                                            <td x-cloak x-show="columns.no_dokumen" class="px-4 py-3 align-top whitespace-nowrap text-gray-900 dark:text-zinc-100">{{ $reminder->no_dokumen }}</td>
+                                            <td x-cloak x-show="columns.no_dokumen" class="px-4 py-3 align-top text-gray-900 dark:text-zinc-100">
+                                                <span class="block overflow-hidden text-ellipsis break-words leading-tight" title="{{ $reminder->no_dokumen }}" style="display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; max-height: 2.5rem;">
+                                                    {{ $reminder->no_dokumen }}
+                                                </span>
+                                            </td>
                                             @if($activeJenis === 'semua')
                                                 <td x-cloak x-show="columns.jenis_dokumen" class="px-4 py-3 align-top whitespace-normal text-gray-900 dark:text-zinc-100">
                                                     @php
@@ -309,7 +317,7 @@
                                             </td>
                                             <td x-cloak x-show="columns.terbit" class="px-4 py-3 align-top whitespace-nowrap text-gray-900 dark:text-zinc-100">{{ $reminder->tanggal_terbit->format('d-m-Y') }}</td>
                                             <td x-cloak x-show="columns.expired" class="px-4 py-3 align-top">
-                                                <div class="inline-flex items-center rounded-md px-2.5 py-1 whitespace-nowrap text-sm text-gray-900 dark:text-zinc-100">{{ $reminder->tanggal_expired->format('d-m-Y') }}</div>
+                                                <div class="inline-flex items-center rounded-md px-2.5 py-1 whitespace-nowrap text-sm text-gray-900 dark:text-zinc-100">{{ $reminder->tanggal_expired ? $reminder->tanggal_expired->format('d-m-Y') : 'Seumur Hidup' }}</div>
                                             </td>
                                             <td x-cloak x-show="columns.sisa_hari" class="px-4 py-3 align-top whitespace-nowrap text-gray-900 dark:text-zinc-100">
                                                 @if ($showBadge)

@@ -45,13 +45,13 @@ class RegisteredUserController extends Controller
             'no_telpon' => $request->no_telpon,
             'password' => Hash::make($request->password),
             'role' => User::ROLE_USER,
-            'is_active' => true,
+            'is_active' => false,
         ]);
 
         event(new Registered($user));
 
-        Auth::login($user);
+        // Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('login'))->with('status', 'hubungi super admin untuk approved');
     }
 }
