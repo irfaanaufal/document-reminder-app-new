@@ -15,9 +15,13 @@
             <div class="lg:col-span-2 space-y-6">
                 
                 <div class="p-6 bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex flex-col sm:flex-row items-center gap-5">
-                    <div class="w-16 h-16 bg-gradient-to-br from-slate-700 to-slate-900 dark:from-zinc-700 dark:to-zinc-900 rounded-2xl flex items-center justify-center text-white text-2xl font-bold uppercase shadow-md shadow-slate-900/10 tracking-wider">
+                    <div class="w-16 h-16 rounded-2xl overflow-hidden bg-gradient-to-br from-slate-700 to-slate-900 dark:from-zinc-700 dark:to-zinc-900 flex items-center justify-center text-white text-2xl font-bold uppercase shadow-md shadow-slate-900/10 tracking-wider shrink-0">
+                    @if(Auth::user()->avatar_path)
+                        <img src="{{ asset(Auth::user()->avatar_path) }}" alt="Avatar" class="w-full h-full object-cover">
+                    @else
                         {{ substr(Auth::user()->nama ?? 'U', 0, 2) }}
-                    </div>
+                    @endif
+                </div>
                     <div class="text-center sm:text-left">
                         <h3 class="text-xl font-bold text-slate-800 dark:text-zinc-100">{{ Auth::user()->nama }}</h3>
                         <p class="text-sm text-slate-500 dark:text-zinc-400 mt-0.5">{{ Auth::user()->email }}</p>

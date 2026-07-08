@@ -69,12 +69,21 @@
 
         <div class="px-4 py-4 border-t border-gray-200 dark:border-zinc-800 mt-auto overflow-visible">
             <div class="relative" x-data="{ userOpen: false }">
-                <button @click.stop="userOpen = !userOpen" class="w-full text-left">
-                    <div class="text-sm font-medium text-gray-800 dark:text-zinc-100 truncate transition-all duration-200" :class="$root.collapsed && !$root.hovered ? 'opacity-0 max-w-0 pointer-events-none' : 'opacity-100 max-w-[12rem]'" title="{{ Auth::user()->nama }}">{{ Auth::user()->nama }}</div>
-                    <div class="text-xs text-gray-500 dark:text-zinc-300 truncate max-w-[12rem] transition-all duration-200" :class="$root.collapsed && !$root.hovered ? 'opacity-0 max-w-0 pointer-events-none' : 'opacity-100'" title="{{ Auth::user()->email }}">{{ Auth::user()->email }}</div>
-                    @if (Auth::user()?->isSuperAdmin())
-                        <span class="mt-2 inline-flex rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-semibold text-rose-700 dark:bg-rose-900/30 dark:text-rose-300" :class="$root.collapsed && !$root.hovered ? 'opacity-0 max-w-0 pointer-events-none' : 'opacity-100'">Super Admin</span>
-                    @endif
+                <button @click.stop="userOpen = !userOpen" class="w-full text-left flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-white text-sm font-bold shrink-0">
+                        @if(Auth::user()->avatar_path)
+                            <img src="{{ asset(Auth::user()->avatar_path) }}" alt="Avatar" class="w-full h-full object-cover">
+                        @else
+                            {{ substr(Auth::user()->nama ?? 'U', 0, 2) }}
+                        @endif
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="text-sm font-medium text-gray-800 dark:text-zinc-100 truncate transition-all duration-200" :class="$root.collapsed && !$root.hovered ? 'opacity-0 max-w-0 pointer-events-none' : 'opacity-100 max-w-[12rem]'" title="{{ Auth::user()->nama }}">{{ Auth::user()->nama }}</div>
+                        <div class="text-xs text-gray-500 dark:text-zinc-300 truncate max-w-[12rem] transition-all duration-200" :class="$root.collapsed && !$root.hovered ? 'opacity-0 max-w-0 pointer-events-none' : 'opacity-100'" title="{{ Auth::user()->email }}">{{ Auth::user()->email }}</div>
+                        @if (Auth::user()?->isSuperAdmin())
+                            <span class="mt-2 inline-flex rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-semibold text-rose-700 dark:bg-rose-900/30 dark:text-rose-300" :class="$root.collapsed && !$root.hovered ? 'opacity-0 max-w-0 pointer-events-none' : 'opacity-100'">Super Admin</span>
+                        @endif
+                    </div>
                 </button>
 
                 <div x-show="userOpen" x-transition @click.away="userOpen = false" class="absolute left-0 bottom-full z-50 mb-2 w-48 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded shadow-lg">
@@ -170,11 +179,22 @@
         </div>
 
         <div class="mt-auto border-t border-gray-200 dark:border-zinc-800 p-4 overflow-visible">
-            <div class="text-sm font-medium text-gray-800 dark:text-zinc-100 truncate" title="{{ Auth::user()->nama }}">{{ Auth::user()->nama }}</div>
-            <div class="text-xs text-gray-500 dark:text-zinc-300 truncate" title="{{ Auth::user()->email }}">{{ Auth::user()->email }}</div>
-            @if (Auth::user()?->isSuperAdmin())
-                <span class="mt-2 inline-flex rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-semibold text-rose-700 dark:bg-rose-900/30 dark:text-rose-300">Super Admin</span>
-            @endif
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-white text-sm font-bold shrink-0">
+                    @if(Auth::user()->avatar_path)
+                        <img src="{{ asset(Auth::user()->avatar_path) }}" alt="Avatar" class="w-full h-full object-cover">
+                    @else
+                        {{ substr(Auth::user()->nama ?? 'U', 0, 2) }}
+                    @endif
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div class="text-sm font-medium text-gray-800 dark:text-zinc-100 truncate" title="{{ Auth::user()->nama }}">{{ Auth::user()->nama }}</div>
+                    <div class="text-xs text-gray-500 dark:text-zinc-300 truncate" title="{{ Auth::user()->email }}">{{ Auth::user()->email }}</div>
+                    @if (Auth::user()?->isSuperAdmin())
+                        <span class="mt-2 inline-flex rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-semibold text-rose-700 dark:bg-rose-900/30 dark:text-rose-300">Super Admin</span>
+                    @endif
+                </div>
+            </div>
             <div class="mt-3 space-y-1">
                 <a href="{{ route('profile.edit') }}" class="block rounded-md px-3 py-2 text-sm text-gray-700 dark:text-zinc-200 hover:bg-gray-50 dark:hover:bg-zinc-800">Profile</a>
                 <form method="POST" action="{{ route('logout') }}">

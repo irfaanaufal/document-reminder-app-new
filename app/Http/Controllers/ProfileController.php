@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -51,5 +52,38 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    /**
+     * Upload / update avatar photo.
+     */
+    public function updateAvatar(Request $request): JsonResponse
+    {
+        $request->validate([
+            'avatar' => ['required', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:3000'],
+        ]);
+
+        $user = $request->user();
+
+        // Delete old avatar if exists
+        if ($user->avatar_path) {
+            $oldFile = public_path($user->avatar_path);
+            if (file_exists($oldFile)) {
+                unlink($oldFile);
+            }
+        }
+
+        // Save to public/profile-photos/
+        $filename = 'avatar_' . $user->id . '_' . time() . '.' . $request->file('avatar')->getClientOriginalExtension();
+        $request->file('avatar')->move(public_path('profile-photos'), $filename);
+        $path = 'profile-photos/' . $filename;
+
+        $user->avatar_path = $path;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'avatar_url' => asset($path),
+        ]);
     }
 }
