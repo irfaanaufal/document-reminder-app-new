@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\User;
+use App\Models\Application;
+use App\Models\UserApplication;
 
 test('login screen can be rendered', function () {
     $response = $this->get('/login');
@@ -9,7 +11,7 @@ test('login screen can be rendered', function () {
 });
 
 test('users can authenticate using the login screen', function () {
-    $user = User::factory()->create(['is_active' => true]);
+    $user = User::factory()->create();
 
     $response = $this->post('/login', [
         'username' => $user->username,
@@ -21,7 +23,7 @@ test('users can authenticate using the login screen', function () {
 });
 
 test('users can not authenticate with invalid password', function () {
-    $user = User::factory()->create(['is_active' => true]);
+    $user = User::factory()->create();
 
     $this->post('/login', [
         'username' => $user->username,
@@ -31,8 +33,8 @@ test('users can not authenticate with invalid password', function () {
     $this->assertGuest();
 });
 
-test('inactive users can not authenticate', function () {
-    $user = User::factory()->create(['is_active' => false]);
+test('users without active application access can not authenticate', function () {
+    $user = User::factory()->create(['role_id' => User::ROLE_USER]);
 
     $response = $this->post('/login', [
         'username' => $user->username,
@@ -40,11 +42,12 @@ test('inactive users can not authenticate', function () {
     ]);
 
     $this->assertGuest();
-    $response->assertSessionHasErrors(['username' => 'Akun Anda perlu diaktifkan. Silahkan hubungi Team IT untuk diaktifkan.']);
+
+    $response->assertSessionHasErrors(['activation_needed' => 'Akun Anda belum diaktifkan untuk aplikasi ini. Silakan hubungi tim IT.']);
 });
 
 test('users can logout', function () {
-    $user = User::factory()->create(['is_active' => true]);
+    $user = User::factory()->create();
 
     $response = $this->actingAs($user)->post('/logout');
 

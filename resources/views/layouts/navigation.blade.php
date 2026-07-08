@@ -43,17 +43,7 @@
                     </li>
                 @endif
 
-                @if (Auth::user()?->isSuperAdmin())
-                    @php $activeAccess = request()->routeIs('access-control.*') ? 'bg-gray-100 text-gray-900 dark:bg-zinc-800 dark:text-zinc-100' : 'text-gray-700 dark:text-zinc-200 hover:bg-gray-50 dark:hover:bg-zinc-800'; @endphp
-                    <li>
-                        <a href="{{ route('access-control.index') }}" class="{{ $activeAccess }} flex items-center gap-3 rounded-md px-3 py-2 transition-colors overflow-hidden" :class="$root.collapsed && !$root.hovered ? 'justify-center' : ''">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M10 2a3 3 0 100 6 3 3 0 000-6zM4 14a4 4 0 118 0v1H4v-1zm10.5-2a2.5 2.5 0 11-2.45 3h4.9a2.5 2.5 0 01-2.45-3z" />
-                            </svg>
-                            <span class="whitespace-nowrap transition-all duration-200" :class="$root.collapsed && !$root.hovered ? 'opacity-0 max-w-0 pointer-events-none' : 'opacity-100 max-w-[8rem]'">Hak Akses</span>
-                        </a>
-                    </li>
-                @endif
+
 
                 @php $activeDoc = request()->routeIs('dokumen') || request()->routeIs('doc_type.*') ? 'bg-gray-100 text-gray-900 dark:bg-zinc-800 dark:text-zinc-100' : 'text-gray-700 dark:text-zinc-200 hover:bg-gray-50 dark:hover:bg-zinc-800'; @endphp
                 <li>
@@ -155,17 +145,7 @@
                     </li>
                 @endif
 
-                @if (Auth::user()?->isSuperAdmin())
-                    @php $activeAccess = request()->routeIs('access-control.*') ? 'bg-gray-100 text-gray-900 dark:bg-zinc-800 dark:text-zinc-100' : 'text-gray-700 dark:text-zinc-200 hover:bg-gray-50 dark:hover:bg-zinc-800'; @endphp
-                    <li>
-                        <a href="{{ route('access-control.index') }}" class="{{ $activeAccess }} flex items-center gap-3 rounded-md px-3 py-2 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M10 2a3 3 0 100 6 3 3 0 000-6zM4 14a4 4 0 118 0v1H4v-1zm10.5-2a2.5 2.5 0 11-2.45 3h4.9a2.5 2.5 0 01-2.45-3z" />
-                            </svg>
-                            <span>Hak Akses</span>
-                        </a>
-                    </li>
-                @endif
+
 
                 @php $activeDoc = request()->routeIs('dokumen') || request()->routeIs('doc_type.*') ? 'bg-gray-100 text-gray-900 dark:bg-zinc-800 dark:text-zinc-100' : 'text-gray-700 dark:text-zinc-200 hover:bg-gray-50 dark:hover:bg-zinc-800'; @endphp
                 <li>

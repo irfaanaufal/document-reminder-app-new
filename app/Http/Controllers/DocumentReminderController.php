@@ -85,7 +85,7 @@ class DocumentReminderController extends Controller
         foreach ($userIds as $userId) {
             if (isset($users[$userId])) {
                 $syncData[$userId] = [
-                    'nama' => $users[$userId]->nama,
+                    'nama' => $users[$userId]->name,
                     'no_telpon' => $this->normalizePhoneNumber($users[$userId]->no_telpon)
                 ];
             }
@@ -131,7 +131,7 @@ class DocumentReminderController extends Controller
     {
         return view('doc.create', [
             'documentTypes' => $this->documentTypesForForm(),
-            'users' => User::where('is_active', true)->orderBy('nama')->get(),
+            'users' => User::orderBy('name')->get(),
         ]);
     }
 
@@ -151,7 +151,7 @@ class DocumentReminderController extends Controller
             'reminder' => $reminder,
             'documentTypes' => $this->documentTypesForForm($reminder),
             'selectedDocumentTypeId' => $this->documentTypeIdForForm($reminder),
-            'users' => User::where('is_active', true)->orderBy('nama')->get(),
+            'users' => User::orderBy('name')->get(),
         ]);
     }
 

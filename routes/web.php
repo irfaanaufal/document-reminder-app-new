@@ -4,23 +4,20 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DocumentReminderController;
 use App\Http\Controllers\DocumentTypeController;
 use App\Http\Controllers\ReminderLogController;
-use App\Http\Controllers\AccessControlController;
 use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\LogNotifikasiController;
 use App\Models\DocumentReminder;
 use App\Models\DocumentType;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 
-// helper removed: compute reminders to notify inline in dashboard routes
-
 Route::get('/', function () {
     return view('welcome');
 });
 
-
-
 Route::get('/dashboard', function () {
+    \Illuminate\Support\Facades\Log::info('DASHBOARD_ROUTE_HIT', ['user' => auth()->id()]);
     $today = now();
     $monthNames = [
         1 => 'Januari',
@@ -71,7 +68,6 @@ Route::get('/dashboard', function () {
             ];
         }
 
-        // Use the same thresholds as the Manajemen Dokumen view (doc.read)
         if ($reminderMonths === 1) {
             if ($daysLeft > 30) {
                 $state = 'neutral';
@@ -141,7 +137,6 @@ Route::get('/dashboard', function () {
         ];
     };
 
-    // Quick test: inject a dummy reminder when ?test_reminders=1 is present
     if (request()->has('test_reminders')) {
         $dummy = (object) [
             'nama_dokumen' => 'DUMMY Dokumen Demo',
@@ -175,7 +170,6 @@ Route::get('/dashboard', function () {
         return $reminder->tanggal_expired && $reminder->tanggal_expired->lt($today->copy()->startOfDay());
     })->count();
 
-    // allow viewing other months via ?month=YYYY-MM
     $requestedMonth = request()->string('month')->toString();
     if ($requestedMonth) {
         try {
@@ -211,7 +205,6 @@ Route::get('/dashboard', function () {
         $dateKey = $date->toDateString();
         $documentsForDate = $calendarDocuments[$dateKey] ?? [];
 
-        // Determine day-level state by prioritizing the most severe document state
         $dayState = 'empty';
         if (! empty($documentsForDate)) {
             $docs = collect($documentsForDate);
@@ -286,9 +279,9 @@ Route::get('/dashboard', function () {
         'calendarPrev' => $calendarPrev,
         'calendarNext' => $calendarNext,
     ]);
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth', 'applications.access'])->name('dashboard');
 
-Route::middleware(['auth', 'verified', 'role:1,2'])->group(function () {
+Route::middleware(['auth', 'verified', 'applications.access', 'role:1,2'])->group(function () {
     Route::get('/admin/dashboard', function () {
         return redirect()->route('dashboard');
     })->name('admin.dashboard');
@@ -297,18 +290,13 @@ Route::middleware(['auth', 'verified', 'role:1,2'])->group(function () {
     Route::post('/logs/{log}/retry', [ReminderLogController::class, 'retry'])->name('logs.retry');
 });
 
-Route::middleware(['auth', 'verified', 'role:1'])->group(function () {
-    Route::get('/hak-akses', [AccessControlController::class, 'index'])->name('access-control.index');
-    Route::patch('/hak-akses/{user}', [AccessControlController::class, 'update'])->name('access-control.update');
-});
-
 Route::middleware(['auth', 'verified', 'role:3'])->group(function () {
     Route::get('/user/dashboard', function () {
         return redirect()->route('dashboard');
     })->name('user.dashboard');
 });
 
-Route::middleware(['auth', 'verified', 'role:1,2,3'])->group(function () {
+Route::middleware(['auth', 'verified', 'applications.access', 'role:1,2,3'])->group(function () {
     Route::get('/chatbot', [ChatbotController::class, 'index'])->name('chatbot.index');
     Route::post('/chatbot/send', [ChatbotController::class, 'sendMessage'])->name('chatbot.send');
 
@@ -376,7 +364,6 @@ Route::middleware(['auth', 'verified', 'role:1,2,3'])->group(function () {
             });
         }
 
-        // Support server-side filtering for expired documents via ?expired=1
         if (request()->boolean('expired')) {
             $remindersQuery->where('tanggal_expired', '<', $today->copy()->startOfDay());
         }
@@ -411,5 +398,15 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::middleware('auth')->prefix('api')->group(function () {
+    Route::get('/notifications', [LogNotifikasiController::class, 'index']);
+    Route::patch('/notifications/read-all', [LogNotifikasiController::class, 'markAllRead']);
+});
+
+Route::get('/applications', [App\Http\Controllers\ApplicationController::class, 'index'])
+    ->middleware('auth')->name('applications.index');
+Route::post('/applications/request', [App\Http\Controllers\ApplicationController::class, 'requestAccess'])
+    ->middleware('auth')->name('applications.request');
 
 require __DIR__.'/auth.php';

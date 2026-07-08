@@ -26,7 +26,6 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
             'no_telpon' => '082353575812',
             'role' => User::ROLE_SUPER_ADMIN,
-            'is_active' => true,
         ]);
 
         User::updateOrCreate([
@@ -37,7 +36,6 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
             'no_telpon' => '081902588715',
             'role' => User::ROLE_SUPER_ADMIN,
-            'is_active' => true,
         ]);
     }
 }

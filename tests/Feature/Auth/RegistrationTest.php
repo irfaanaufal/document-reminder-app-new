@@ -18,10 +18,9 @@ test('new users can register', function () {
 
     $this->assertGuest();
     $response->assertRedirect(route('login'));
-    $response->assertSessionHas('status', 'hubungi super admin untuk approved');
+    $response->assertSessionHas('status', 'Registrasi berhasil. Silakan hubungi admin untuk aktivasi akun.');
 
     $this->assertDatabaseHas('users', [
         'email' => 'test@example.com',
-        'is_active' => false,
     ]);
 });
