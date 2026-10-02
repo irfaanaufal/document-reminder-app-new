@@ -5,8 +5,8 @@
         </h2>
     </x-slot>
 
-    <div class="py-6">
-        <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
+    <div>
+        <div class="mx-auto max-w-3xl">
             <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
                 @if ($errors->any())
                     <div class="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-900/30 dark:text-red-300">

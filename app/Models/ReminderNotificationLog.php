@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
     'document_reminder_id',
-    'recipient_phone',
+    'recipient_email',
     'recipient_name',
     'scheduled_for',
     'reminder_rule',

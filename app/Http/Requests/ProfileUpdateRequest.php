@@ -9,11 +9,6 @@ use Illuminate\Validation\Rule;
 
 class ProfileUpdateRequest extends FormRequest
 {
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
@@ -27,10 +22,10 @@ class ProfileUpdateRequest extends FormRequest
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
             'no_telpon' => [
-                'required', 
-                'string', 
-                'max:20', 
-                Rule::unique(User::class)->ignore($this->user()->id)
+                'required',
+                'string',
+                'max:20',
+                Rule::unique(User::class)->ignore($this->user()->id),
             ],
             'email' => [
                 'required',
@@ -40,6 +35,7 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            'current_password' => ['required', 'current_password'],
         ];
     }
 }

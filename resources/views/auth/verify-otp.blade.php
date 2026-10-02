@@ -23,20 +23,26 @@
         <form method="POST" action="{{ route('password.otp.verify') }}" class="space-y-6"
               x-data="{ 
                 otpValues: ['', '', '', '', '', ''],
+                getOtpInputs() {
+                    return this.$root.querySelectorAll('input[maxlength="1"]');
+                },
+                focusOtp(index) {
+                    const inputs = this.getOtpInputs();
+                    if (inputs[index]) inputs[index].focus();
+                },
                 handleInput(e, index) {
                     let val = e.target.value.replace(/[^0-9]/g, ''); // Hanya izinkan angka
                     this.otpValues[index] = val.substring(val.length - 1);
-                    
+                    this.syncHiddenInput();
                     // Auto focus ke box selanjutnya
                     if (this.otpValues[index] !== '' && index < 5) {
-                        this.$refs['input' + (index + 1)].focus();
+                        this.focusOtp(index + 1);
                     }
-                    this.syncHiddenInput();
                 },
                 handleKeyDown(e, index) {
                     // Backspace untuk kembali ke box sebelumnya
                     if (e.key === 'Backspace' && this.otpValues[index] === '' && index > 0) {
-                        this.$refs['input' + (index - 1)].focus();
+                        this.focusOtp(index - 1);
                     }
                 },
                 handlePaste(e) {
@@ -47,8 +53,7 @@
                     }
                     this.syncHiddenInput();
                     // Focus ke box terakhir yang terisi
-                    let nextFocus = Math.min(pasteData.length, 5);
-                    this.$refs['input' + nextFocus].focus();
+                    this.focusOtp(Math.min(pasteData.length, 5));
                 },
                 syncHiddenInput() {
                     this.$refs.hiddenOtp.value = this.otpValues.join('');
@@ -65,18 +70,17 @@
                     {{ __('Kode Akses') }}
                 </label>
                 
-                <div class="flex justify-between gap-2 sm:gap-3" @paste="handlePaste($event)">
+                <div class="flex justify-between gap-1.5 sm:gap-2" @paste="handlePaste($event)">
                     <template x-for="(value, index) in otpValues" :key="index">
                         <input 
                             type="text" 
                             maxlength="1"
                             inputmode="numeric"
                             pattern="[0-9]*"
-                            :x-ref="'input' + index"
                             :value="value"
                             @input="handleInput($event, index)"
                             @keydown="handleKeyDown($event, index)"
-                            class="w-12 h-14 sm:w-14 sm:h-16 text-center text-xl sm:text-2xl font-bold bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700/80 rounded-xl focus:bg-white dark:focus:bg-zinc-900 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all duration-150 shadow-inner"
+                            class="w-10 h-12 sm:w-12 sm:h-14 min-w-0 text-center text-lg sm:text-xl font-bold bg-gray-50/50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700/80 rounded-xl focus:bg-white dark:focus:bg-zinc-900 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all duration-150 shadow-inner"
                             required
                         />
                     </template>

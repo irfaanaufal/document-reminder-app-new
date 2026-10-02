@@ -4,12 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'Reminder App') }}</title>
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased m-0 p-0 bg-gradient-to-r from-[#e2e8f0] to-[#dbeafe]">
+<body class="font-sans antialiased m-0 p-0 bg-gradient-to-r from-[#e2e8f0] to-[#dbeafe] dark:from-zinc-950 dark:to-zinc-900">
     <div class="min-h-screen flex items-center justify-center p-4 sm:p-6">
         {{ $slot }}
     </div>

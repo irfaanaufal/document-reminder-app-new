@@ -3,17 +3,17 @@
 namespace App\Console\Commands;
 
 use App\Models\ReminderNotificationLog;
-use App\Services\FonnteService;
+use App\Services\ReminderMailService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class SendDocumentReminders extends Command
 {
-    protected $signature = 'reminders:send {--dry-run : Simulate sending without calling Fonnte} {--date= : Override today date (Y-m-d) for testing} {--reminder-id= : Limit to a single document reminder id} {--phone= : Override target phone number for testing}';
+    protected $signature = 'reminders:send {--dry-run : Simulate sending without calling mail} {--date= : Override today date (Y-m-d) for testing} {--reminder-id= : Limit to a single document reminder id} {--email= : Override target email for testing}';
 
-    protected $description = 'Send reminder notifications for documents to internal PIC via Fonnte';
+    protected $description = 'Send reminder notifications for documents to internal PIC via email';
 
-    public function handle(FonnteService $fonnteService): int
+    public function handle(ReminderMailService $mailService): int
     {
         $today = $this->option('date')
             ? Carbon::parse((string) $this->option('date'))->startOfDay()
@@ -21,14 +21,14 @@ class SendDocumentReminders extends Command
 
         $dryRun = (bool) $this->option('dry-run');
         $logsQuery = ReminderNotificationLog::query()
-            ->with(['documentReminder:id,no_dokumen,nama_dokumen,pic_nama,pic_telpon,penerbit_tujuan,tanggal_expired,tanggal_terbit,reminder_bulan'])
+            ->with(['documentReminder:id,no_dokumen,nama_dokumen,pic_nama,pic_email,penerbit_tujuan,tanggal_expired,tanggal_terbit,reminder_bulan,attachment_path,attachment_name'])
             ->where('status', 'pending')
             ->whereDate('scheduled_for', '<=', $today->toDateString())
             ->when($this->option('reminder-id'), function ($query) {
                 $query->where('document_reminder_id', (int) $this->option('reminder-id'));
             })
-            ->when($this->option('phone'), function ($query) {
-                $query->where('recipient_phone', (string) $this->option('phone'));
+            ->when($this->option('email'), function ($query) {
+                $query->where('recipient_email', (string) $this->option('email'));
             });
 
         $logs = $logsQuery->get();
@@ -41,6 +41,7 @@ class SendDocumentReminders extends Command
 
         $sentCount = 0;
         $skippedCount = 0;
+        $failedLogIds = collect();
 
         foreach ($logs as $log) {
             $document = $log->documentReminder;
@@ -54,71 +55,118 @@ class SendDocumentReminders extends Command
                         'message' => 'Dokumen terkait log tidak ditemukan.',
                     ],
                 ]);
+                $failedLogIds->push($log->id);
 
                 $this->warn("Skipped log {$log->id}: related document missing.");
                 continue;
             }
 
-            $phone = $this->option('phone')
-                ? $fonnteService->normalizePhoneForWhatsapp((string) $this->option('phone'))
-                : $fonnteService->normalizePhoneForWhatsapp($log->recipient_phone ?: $document->pic_telpon);
+            $email = $this->option('email')
+                ? $this->option('email')
+                : $log->recipient_email;
 
             $recipientName = trim((string) ($log->recipient_name ?: $document->pic_nama));
 
-            if ($phone === '') {
+            if (empty($email)) {
                 $skippedCount++;
                 $log->increment('attempt_count');
                 $log->update([
                     'status' => 'failed',
                     'provider_response' => [
-                        'message' => 'PIC internal phone is empty.',
+                        'message' => 'PIC internal email is empty.',
                     ],
                 ]);
+                $failedLogIds->push($log->id);
 
-                $this->warn("Skipped {$document->no_dokumen}: PIC internal phone is empty.");
+                $this->warn("Skipped {$document->no_dokumen}: PIC internal email is empty.");
                 continue;
             }
 
-            $message = $fonnteService->buildReminderMessage([
+            $daysLeft = null;
+            if ($document->tanggal_expired !== null) {
+                $daysLeft = (int) $today->diffInDays($document->tanggal_expired, false);
+            }
+
+            $reminderRule = strtolower(trim((string) ($log->reminder_rule ?? '')));
+
+            $closingLine = 'Demikian informasi ini kami sampaikan. Atas perhatian dan tindak lanjutnya, kami ucapkan terima kasih.';
+            if ($daysLeft !== null && $daysLeft === 0) {
+                $closingLine = 'Berkaitan dengan batas waktu yang berakhir hari ini, mohon dokumen ini menjadi prioritas utama untuk segera diproses. Terima kasih atas perhatian dan kerjasamanya.';
+            } elseif ($daysLeft !== null && $daysLeft < 0) {
+                $closingLine = 'Dokumen ini telah melewati batas waktu. Mohon segera dilakukan evaluasi dan penanganan untuk menghindari konsekuensi lebih lanjut. Terima kasih.';
+            }
+
+            $intro = 'Kami informasikan bahwa dokumen berikut telah memasuki masa pemantauan dan memerlukan persiapan penanganan:';
+            if ($reminderRule === 'h-7') {
+                $intro = 'Peringatan: Dokumen berikut akan jatuh tempo dalam 7 hari. Mohon segera dilakukan pengecekan dan persiapan perpanjangan atau pemrosesan:';
+            } elseif ($reminderRule === 'h-0') {
+                $intro = 'URGENT: Dokumen berikut mencapai batas waktu hari ini. Mohon segera diproses untuk menghindari risiko kedaluwarsa:';
+            } elseif ($reminderRule === 'h-14') {
+                $intro = 'Dokumen berikut akan mencapai tanggal jatuh tempo dalam 14 hari ke depan. Mohon dapat dipersiapkan tindak lanjut yang diperlukan:';
+            }
+
+            $sisaWaktuDisplay = '-';
+            if ($daysLeft !== null) {
+                if ($daysLeft === 0) {
+                    $sisaWaktuDisplay = 'Hari ini';
+                } elseif ($daysLeft > 0) {
+                    $sisaWaktuDisplay = $daysLeft . ' hari';
+                } else {
+                    $sisaWaktuDisplay = 'LEWAT ' . abs($daysLeft) . ' hari';
+                }
+            }
+
+            $viewData = [
                 'pic_nama' => $recipientName,
                 'nama_dokumen' => $document->nama_dokumen,
                 'no_dokumen' => $document->no_dokumen,
                 'penerbit_tujuan' => $document->penerbit_tujuan,
-                'tanggal_terbit' => optional($document->tanggal_terbit)->format('d-m-Y'),
                 'tanggal_expired' => optional($document->tanggal_expired)->format('d-m-Y'),
-                'reminder_bulan' => $document->reminder_bulan,
+                'sisa_waktu' => $sisaWaktuDisplay,
+                'sisa_hari' => $daysLeft,
+                'intro' => $intro,
+                'closing' => $closingLine,
+                'attachment_name' => $document->attachment_name,
+            ];
+
+            $subject = $mailService->buildSubject([
+                'nama_dokumen' => $document->nama_dokumen,
                 'reminder_rule' => (string) $log->reminder_rule,
-                'sisa_hari' => $today->diffInDays($document->tanggal_expired, false),
+                'sisa_hari' => $daysLeft,
             ]);
 
-            $log->increment('attempt_count');
-
             try {
-                $response = $dryRun
-                    ? [
-                        'ok' => true,
-                        'status' => 200,
-                        'body' => [
-                            'dry_run' => true,
-                            'target' => $phone,
-                            'message' => $message,
-                        ],
-                    ]
-                    : $fonnteService->sendMessage($phone, $message);
+                if ($dryRun) {
+                    $body = view('emails.reminder', $viewData)->render();
+                    $sentCount++;
+                    $this->info("[DRY-RUN] Would send reminder for {$document->no_dokumen} to {$email}.");
+                    continue;
+                }
+
+                $log->increment('attempt_count');
+                $response = $mailService->sendHtmlEmail(
+                    $email,
+                    $subject,
+                    'emails.reminder',
+                    $viewData,
+                    $document->attachment_path,
+                    $document->attachment_name
+                );
 
                 $log->update([
-                    'status' => $dryRun ? 'dry_run' : ($response['ok'] ? 'sent' : 'failed'),
-                    'sent_at' => $response['ok'] && ! $dryRun ? now() : null,
+                    'status' => $response['ok'] ? 'sent' : 'failed',
+                    'sent_at' => $response['ok'] ? now() : null,
                     'provider_response' => $response,
-                    'recipient_phone' => $phone,
+                    'recipient_email' => $email,
                     'recipient_name' => $recipientName,
                 ]);
 
                 if ($response['ok']) {
                     $sentCount++;
-                    $this->info(($dryRun ? '[DRY-RUN] Would send' : 'Sent') . " reminder for {$document->no_dokumen} to {$phone}.");
+                    $this->info("Sent reminder for {$document->no_dokumen} to {$email}.");
                 } else {
-                    $this->error("Failed reminder for {$document->no_dokumen} to {$phone}. Status: {$response['status']}");
+                    $failedLogIds->push($log->id);
+                    $this->error("Failed reminder for {$document->no_dokumen} to {$email}.");
                 }
             } catch (\Throwable $throwable) {
                 $log->update([
@@ -127,12 +175,19 @@ class SendDocumentReminders extends Command
                         'message' => $throwable->getMessage(),
                     ],
                 ]);
+                $failedLogIds->push($log->id);
 
                 $this->error("Error sending {$document->no_dokumen}: {$throwable->getMessage()}");
             }
         }
 
-        $this->info("Done. Sent: {$sentCount}, skipped: {$skippedCount}.");
+        $this->info("Done. Sent: {$sentCount}, skipped: {$skippedCount}." . ($dryRun ? ' (dry-run: status unchanged)' : ''));
+
+        if (! $dryRun && $failedLogIds->isNotEmpty()) {
+            $failedLogs = ReminderNotificationLog::whereIn('id', $failedLogIds)->get();
+            $mailService->sendFailureNotification($failedLogs, $sentCount);
+            $this->info("Failure notification sent to IT team.");
+        }
 
         return self::SUCCESS;
     }

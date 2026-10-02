@@ -10,6 +10,11 @@ use Illuminate\View\View;
 
 class DocumentTypeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:manageDocumentType');
+    }
+
     public function index(): View
     {
         $documentTypes = DocumentType::query()
@@ -80,6 +85,12 @@ class DocumentTypeController extends Controller
 
     public function destroy(DocumentType $doc_type): RedirectResponse
     {
+        if ($doc_type->documents()->exists()) {
+            return redirect()
+                ->route('doc_type.index')
+                ->with('error', 'Jenis dokumen tidak dapat dihapus karena masih digunakan oleh dokumen.');
+        }
+
         $doc_type->delete();
 
         return redirect()

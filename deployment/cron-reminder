@@ -1,0 +1,20 @@
+# ============================================================
+# CRON CONFIG — reminder-app Scheduler
+# Jalankan di server sebagai root
+# ============================================================
+
+# Tambah cron job untuk reminder-app scheduler
+# Jalankan: bash setup-cron.sh
+
+echo "Setting up cron job for reminder-app..."
+
+# Hapus cron lama untuk reminder-app (jika ada)
+crontab -l 2>/dev/null | grep -v "reminder-app" | crontab - 2>/dev/null || true
+
+# Tambah cron baru
+(crontab -l 2>/dev/null; echo "* * * * * cd /var/www/reminder-app && php artisan schedule:run >> /dev/null 2>&1") | crontab -
+
+echo "Cron job added successfully."
+echo ""
+echo "Current crontab:"
+crontab -l

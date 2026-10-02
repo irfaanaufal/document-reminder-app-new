@@ -4,17 +4,16 @@ namespace App\Console\Commands;
 
 use App\Models\DocumentReminder;
 use App\Models\ReminderNotificationLog;
-use App\Services\FonnteService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class QueueDocumentReminders extends Command
 {
-    protected $signature = 'reminders:queue {--date= : Override today date (Y-m-d) for testing} {--reminder-id= : Limit to a single document reminder id} {--phone= : Override target phone number for testing}';
+    protected $signature = 'reminders:queue {--date= : Override today date (Y-m-d) for testing} {--reminder-id= : Limit to a single document reminder id} {--email= : Override target email for testing}';
 
     protected $description = 'Prepare pending reminder logs for documents that need notification';
 
-    public function handle(FonnteService $fonnteService): int
+    public function handle(): int
     {
         $today = $this->option('date')
             ? Carbon::parse((string) $this->option('date'))->startOfDay()
@@ -29,43 +28,46 @@ class QueueDocumentReminders extends Command
 
         $createdCount = 0;
         $existingCount = 0;
+        $skippedCount = 0;
+        $lookback = $today->copy()->subDays(3)->toDateString();
 
         foreach ($documents as $document) {
             foreach ($this->buildScheduleDates($document) as $scheduledFor => $ruleLabel) {
-                if ($scheduledFor !== $today->toDateString()) {
+                if ($scheduledFor > $today->toDateString()) {
+                    continue;
+                }
+                if ($scheduledFor < $lookback) {
                     continue;
                 }
 
-                // Collect all recipients: internal PICs from pivot table
                 $recipients = [];
 
                 if ($document->internalPics->isNotEmpty()) {
                     foreach ($document->internalPics as $pic) {
-                        $phone = $this->option('phone')
-                            ? $fonnteService->normalizePhoneForWhatsapp((string) $this->option('phone'))
-                            : $fonnteService->normalizePhoneForWhatsapp($pic->pivot->no_telpon ?? $pic->no_telpon);
+                        $email = $this->option('email')
+                            ? $this->option('email')
+                            : $pic->email;
+
+                        if (empty($email)) {
+                            $skippedCount++;
+                            $this->warn("Skipped {$document->no_dokumen}: PIC {$pic->name} has no email.");
+                            continue;
+                        }
 
                         $recipients[] = [
-                            'phone' => $phone,
-                            'name' => $pic->pivot->nama ?? $pic->nama,
+                            'email' => $email,
+                            'name' => $pic->pivot->nama ?? $pic->name,
                         ];
                     }
                 } else {
-                    // Fallback to legacy primary PIC fields
-                    $phone = $this->option('phone')
-                        ? $fonnteService->normalizePhoneForWhatsapp((string) $this->option('phone'))
-                        : $fonnteService->normalizePhoneForWhatsapp($document->pic_telpon);
-
-                    $recipients[] = [
-                        'phone' => $phone,
-                        'name' => trim((string) $document->pic_nama),
-                    ];
+                    $this->warn("No internal PICs for {$document->no_dokumen}, skipping.");
+                    continue;
                 }
 
                 foreach ($recipients as $recipient) {
                     $log = ReminderNotificationLog::firstOrCreate([
                         'document_reminder_id' => $document->id,
-                        'recipient_phone' => $recipient['phone'],
+                        'recipient_email' => $recipient['email'],
                         'scheduled_for' => $scheduledFor,
                     ], [
                         'recipient_name' => $recipient['name'],
@@ -76,7 +78,13 @@ class QueueDocumentReminders extends Command
 
                     if ($log->wasRecentlyCreated) {
                         $createdCount++;
-                        $this->info("Queued {$document->no_dokumen} for {$scheduledFor} -> {$recipient['name']} ({$recipient['phone']}).");
+                        $this->info("Queued {$document->no_dokumen} for {$scheduledFor} -> {$recipient['name']} ({$recipient['email']}).");
+                        continue;
+                    }
+
+                    if ($log->status === 'dry_run') {
+                        $log->update(['status' => 'pending']);
+                        $this->info("Requeued dry-run log for {$document->no_dokumen} on {$scheduledFor} -> {$recipient['email']}.");
                         continue;
                     }
 
@@ -86,7 +94,7 @@ class QueueDocumentReminders extends Command
             }
         }
 
-        $this->info("Done. Created: {$createdCount}, existing: {$existingCount}.");
+        $this->info("Done. Created: {$createdCount}, existing: {$existingCount}, skipped: {$skippedCount}.");
 
         return self::SUCCESS;
     }
@@ -96,6 +104,10 @@ class QueueDocumentReminders extends Command
      */
     private function buildScheduleDates(DocumentReminder $document): array
     {
+        if (is_null($document->tanggal_expired) || is_null($document->reminder_bulan)) {
+            return [];
+        }
+
         $expired = Carbon::parse($document->tanggal_expired)->startOfDay();
         $monthlyStart = $expired->copy()->subMonthsNoOverflow((int) $document->reminder_bulan)->startOfDay();
         $monthlyEnd = $expired->copy()->subMonthNoOverflow()->startOfDay();

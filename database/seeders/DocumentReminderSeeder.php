@@ -15,8 +15,8 @@ class DocumentReminderSeeder extends Seeder
      */
     public function run(): void
     {
-        $admin = User::whereIn('role', [User::ROLE_SUPER_ADMIN, User::ROLE_ADMIN])->first();
-        $user = User::where('role', User::ROLE_USER)->first();
+        $admin = User::whereHas('role', fn($q) => $q->where('level', '<=', 4))->first();
+        $user = User::whereHas('role', fn($q) => $q->where('level', '>', 4))->first();
 
         if (! $admin || ! $user) {
             return;
@@ -25,7 +25,7 @@ class DocumentReminderSeeder extends Seeder
         $makeRecord = function (array $data): array {
             return array_merge([
                 'pic_nama' => 'Irfaan',
-                'pic_telpon' => '087712733183',
+                'pic_email' => '',
             ], $data);
         };
 
@@ -43,7 +43,7 @@ class DocumentReminderSeeder extends Seeder
                 'tanggal_expired' => Carbon::create(2026, 6, 30)->toDateString(),
                 'reminder_bulan' => 3,
                 'pic_nama' => 'Irfaan Naufal',
-                'pic_telpon' => '087712733183',
+                'pic_email' => '',
                 'pic_external_nama' => '',
                 'pic_external_telpon' => '',
                 'attachment_path' => 'document-reminders/sample-slo-genset.png',
@@ -59,7 +59,7 @@ class DocumentReminderSeeder extends Seeder
                 'tanggal_expired' => Carbon::create(2026, 6, 5)->toDateString(),
                 'reminder_bulan' => 3,
                 'pic_nama' => 'Andi Saputra',
-                'pic_telpon' => '087712733183',
+                'pic_email' => '',
                 'pic_external_nama' => '',
                 'pic_external_telpon' => '',
                 'attachment_path' => 'document-reminders/sample-iso-9001.png',
@@ -75,7 +75,7 @@ class DocumentReminderSeeder extends Seeder
                 'tanggal_expired' => Carbon::create(2026, 8, 22)->toDateString(),
                 'reminder_bulan' => 6,
                 'pic_nama' => 'Irfaan Naufal',
-                'pic_telpon' => '087712733183',
+                'pic_email' => '',
                 'pic_external_nama' => '',
                 'pic_external_telpon' => '',
                 'attachment_path' => 'document-reminders/sample-k3.png',
@@ -91,7 +91,7 @@ class DocumentReminderSeeder extends Seeder
                 'tanggal_expired' => Carbon::create(2026, 10, 17)->toDateString(),
                 'reminder_bulan' => 3,
                 'pic_nama' => 'Irfaan Naufal',
-                'pic_telpon' => '087712733183',
+                'pic_email' => '',
                 'pic_external_nama' => '',
                 'pic_external_telpon' => '',
                 'attachment_path' => 'document-reminders/sample-audit-internal.png',
@@ -107,7 +107,7 @@ class DocumentReminderSeeder extends Seeder
                 'tanggal_expired' => Carbon::create(2026, 6, 1)->toDateString(),
                 'reminder_bulan' => 1,
                 'pic_nama' => 'Dewi Anggraini',
-                'pic_telpon' => '087712733183',
+                'pic_email' => '',
                 'pic_external_nama' => '',
                 'pic_external_telpon' => '',
                 'attachment_path' => 'document-reminders/sample-wlt-operasional.pdf',
@@ -123,7 +123,7 @@ class DocumentReminderSeeder extends Seeder
                 'tanggal_expired' => Carbon::create(2026, 9, 12)->toDateString(),
                 'reminder_bulan' => 6,
                 'pic_nama' => 'Andi Saputra',
-                'pic_telpon' => '087712733183',
+                'pic_email' => '',
                 'pic_external_nama' => '',
                 'pic_external_telpon' => '',
                 'attachment_path' => 'document-reminders/sample-wlt-lingkungan.pdf',
@@ -139,7 +139,7 @@ class DocumentReminderSeeder extends Seeder
                 'tanggal_expired' => Carbon::create(2027, 2, 14)->toDateString(),
                 'reminder_bulan' => 12,
                 'pic_nama' => 'Budi Hartono',
-                'pic_telpon' => '087712733183',
+                'pic_email' => '',
                 'pic_external_nama' => '',
                 'pic_external_telpon' => '',
                 'attachment_path' => 'document-reminders/sample-wlt-pajak.pdf',
@@ -155,7 +155,7 @@ class DocumentReminderSeeder extends Seeder
                 'tanggal_expired' => Carbon::create(2026, 7, 20)->toDateString(),
                 'reminder_bulan' => 6,
                 'pic_nama' => 'Sari Wulandari',
-                'pic_telpon' => '087712733183',
+                'pic_email' => '',
                 'pic_external_nama' => '',
                 'pic_external_telpon' => '',
                 'attachment_path' => 'document-reminders/sample-wlt-ketenagakerjaan.pdf',
@@ -171,7 +171,7 @@ class DocumentReminderSeeder extends Seeder
                 'tanggal_expired' => Carbon::create(2026, 12, 30)->toDateString(),
                 'reminder_bulan' => 6,
                 'pic_nama' => 'Rudi Setiawan',
-                'pic_telpon' => '087712733183',
+                'pic_email' => '',
                 'pic_external_nama' => '',
                 'pic_external_telpon' => '',
                 'attachment_path' => 'document-reminders/sample-wlt-keamanan.pdf',
@@ -187,7 +187,7 @@ class DocumentReminderSeeder extends Seeder
             //     'tanggal_expired' => Carbon::create(2026, 4, 25)->toDateString(),
             //     'reminder_bulan' => 1,
             //     'pic_nama' => 'Nina Kartika',
-            //     'pic_telpon' => '087712733183',
+            //     'pic_email' => '',
             //     'attachment_path' => 'document-reminders/sample-wlt-lingkungan-utama.pdf',
             //     'attachment_name' => 'sample-wlt-lingkungan-utama.pdf',
             // ]),
@@ -201,7 +201,7 @@ class DocumentReminderSeeder extends Seeder
             //     'tanggal_expired' => Carbon::create(2026, 6, 12)->toDateString(),
             //     'reminder_bulan' => 6,
             //     'pic_nama' => 'Daehoon Lee',
-            //     'pic_telpon' => '087712733183',
+            //     'pic_email' => '',
             //     'attachment_path' => 'document-reminders/sample-wlt-keamanan.pdf',
             //     'attachment_name' => 'sample-wlt-keamanan.pdf',
             // ]),
@@ -215,7 +215,7 @@ class DocumentReminderSeeder extends Seeder
                 'tanggal_expired' => Carbon::create(2026, 7, 1)->toDateString(),
                 'reminder_bulan' => 1,
                 'pic_nama' => 'Rafdean Pratama',
-                'pic_telpon' => '087712733183',
+                'pic_email' => '',
                 'pic_external_nama' => '',
                 'pic_external_telpon' => '',
                 'attachment_path' => 'document-reminders/sample-wlt-lingkungan-utama.pdf',

@@ -35,16 +35,7 @@ return [
         ],
     ],
 
-    'fonnte' => [
-        'token' => env('FONNTE_TOKEN'),
-        'base_url' => env('FONNTE_BASE_URL', 'https://api.fonnte.com/send'),
-        'sender' => env('FONNTE_SENDER'),
-    ],
+    'failure_notify_email' => env('FAILURE_NOTIFY_EMAIL'),
 
-    'chatgpt' => [
-        'api_key' => env('CHATGPT_API_KEY'),
-        'model' => env('CHATGPT_MODEL', 'gpt-4o-mini'),
-        'base_url' => env('CHATGPT_BASE_URL', 'https://api.openai.com/v1'),
-    ],
 
 ];

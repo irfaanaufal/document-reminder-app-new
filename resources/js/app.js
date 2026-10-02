@@ -1,44 +1,42 @@
-
-
 import Alpine from 'alpinejs';
 import { DataTable } from 'simple-datatables';
 import 'simple-datatables/dist/style.css';
 
 window.Alpine = Alpine;
-
 Alpine.start();
 
 document.addEventListener('DOMContentLoaded', () => {
-	document.querySelectorAll('[data-datatable]').forEach((table) => {
-		const searchInput = table.closest('.py-1')?.querySelector('[data-datatable-search-input]');
-		const perPageSelect = table.closest('.py-1')?.querySelector('[data-datatable-perpage]');
+    document.querySelectorAll('[data-datatable]').forEach((table) => {
+        const searchInput = document.querySelector('[data-datatable-search-input]');
 
-		const initialPerPage = perPageSelect ? parseInt(perPageSelect.value, 10) : 9;
+        const dataTable = new DataTable(table, {
+            perPage: 25,
+            perPageSelect: false,
+            searchable: false,
+            labels: { info: '' },
+        });
 
-		const dataTable = new DataTable(table, {
-			perPage: initialPerPage,
-			perPageSelect: false,
-			searchable: !searchInput,
-			labels: { info: '' },
-		});
-
-		if (searchInput) {
-			let debounceTimer = null;
-
-			searchInput.addEventListener('input', () => {
-				window.clearTimeout(debounceTimer);
-				debounceTimer = window.setTimeout(() => {
-					dataTable.search(searchInput.value);
-				}, 150);
-			});
-		}
-
-		if (perPageSelect) {
-			perPageSelect.addEventListener('change', () => {
-				dataTable.options.perPage = parseInt(perPageSelect.value, 10);
-				dataTable.update();
-			});
-		}
-	});
-
+        if (searchInput) {
+            let debounceTimer = null;
+            searchInput.addEventListener('input', () => {
+                window.clearTimeout(debounceTimer);
+                debounceTimer = window.setTimeout(() => {
+                    const value = searchInput.value.trim().toLowerCase();
+                    if (value) {
+                        dataTable.search(value);
+                    } else {
+                        dataTable.search('');
+                    }
+                    document.querySelectorAll('[data-doc-search]').forEach((el) => {
+                        if (!value) {
+                            el.classList.remove('hidden');
+                            return;
+                        }
+                        const hay = (el.getAttribute('data-doc-search') || '').toLowerCase();
+                        el.classList.toggle('hidden', !hay.includes(value));
+                    });
+                }, 150);
+            });
+        }
+    });
 });

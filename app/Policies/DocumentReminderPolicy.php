@@ -20,7 +20,7 @@ class DocumentReminderPolicy
      */
     public function update(User $user, DocumentReminder $reminder): bool
     {
-        return $user->isAdmin() || $user->id === $reminder->user_id;
+        return $user->canManageAllDocuments() || $user->id === $reminder->user_id;
     }
 
     /**
@@ -28,6 +28,6 @@ class DocumentReminderPolicy
      */
     public function delete(User $user, DocumentReminder $reminder): bool
     {
-        return $user->isAdmin() || $user->id === $reminder->user_id;
+        return $user->canManageAllDocuments() || $user->id === $reminder->user_id;
     }
 }

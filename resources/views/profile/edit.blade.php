@@ -8,21 +8,26 @@
     </x-slot>
 
     
-    <div class="py-6 max-w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div class="max-w-full mx-auto space-y-6">
         
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
             
             <div class="lg:col-span-2 space-y-6">
                 
                 <div class="p-6 bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex flex-col sm:flex-row items-center gap-5">
-                    <div class="w-16 h-16 bg-gradient-to-br from-slate-700 to-slate-900 dark:from-zinc-700 dark:to-zinc-900 rounded-2xl flex items-center justify-center text-white text-2xl font-bold uppercase shadow-md shadow-slate-900/10 tracking-wider">
+                    <div class="w-16 h-16 rounded-2xl overflow-hidden bg-gradient-to-br from-slate-700 to-slate-900 dark:from-zinc-700 dark:to-zinc-900 flex items-center justify-center text-white text-2xl font-bold uppercase shadow-md shadow-slate-900/10 tracking-wider shrink-0">
+                    @if(Auth::user()->avatar_path)
+                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url(Auth::user()->avatar_path) }}" alt="Avatar" class="w-full h-full object-cover">
+                    @else
                         {{ substr(Auth::user()->nama ?? 'U', 0, 2) }}
-                    </div>
+                    @endif
+                </div>
                     <div class="text-center sm:text-left">
                         <h3 class="text-xl font-bold text-slate-800 dark:text-zinc-100">{{ Auth::user()->nama }}</h3>
                         <p class="text-sm text-slate-500 dark:text-zinc-400 mt-0.5">{{ Auth::user()->email }}</p>
-                        <span class="inline-flex items-center gap-1.5 mt-2 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-zinc-850 text-slate-800 dark:text-zinc-200">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Akun Aktif
+                        <span class="inline-flex items-center gap-1.5 mt-2 px-2.5 py-0.5 rounded-full text-xs font-medium {{ ($isAppActive ?? false) ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300' }}">
+                            <span class="w-1.5 h-1.5 rounded-full {{ ($isAppActive ?? false) ? 'bg-emerald-500' : 'bg-rose-500' }}"></span>
+                            {{ ($isAppActive ?? false) ? 'Akun Aktif' : 'Akun Nonaktif' }}
                         </span>
                     </div>
                 </div>
@@ -45,18 +50,37 @@
                         @include('profile.partials.update-password-form')
                     </div>
                 </div>
-                <!-- <div class="p-6 bg-white border border-rose-50 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
-                    <div class="flex items-center gap-2 pb-4 mb-4 border-b border-rose-50">
-                        <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                <div class="p-6 bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
+                    <div class="flex items-center gap-2 pb-4 mb-4 border-b border-slate-100 dark:border-zinc-800">
+                        <svg class="w-5 h-5 text-slate-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                         </svg>
-                        <h4 class="font-bold text-sm text-rose-700 uppercase tracking-wider">Zona Bahaya</h4>
+                        <h4 class="font-bold text-sm text-slate-800 dark:text-zinc-200 uppercase tracking-wider">Status Akses</h4>
                     </div>
-                    <div class="max-w-full">
-                        @include('profile.partials.delete-user-form')
+                    <div class="space-y-3">
+                        @if ($isAppActive ?? false)
+                            <p class="text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">
+                                Nonaktifkan akses aplikasi ini dari akun Anda. Untuk mengaktifkan kembali, hubungi tim IT.
+                            </p>
+                            <form method="POST" action="{{ route('profile.access') }}">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit"
+                                    class="inline-flex items-center rounded-md px-4 py-2 text-sm font-semibold text-white transition-colors bg-rose-600 hover:bg-rose-700">
+                                    Nonaktifkan Akses
+                                </button>
+                            </form>
+                        @else
+                            <p class="text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">
+                                Akses aplikasi tidak aktif. Aktivasi hanya dapat dilakukan oleh tim IT melalui persetujuan akses.
+                            </p>
+                        @endif
+                        @error('access')
+                            <p class="text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p>
+                        @enderror
                     </div>
-                </div> -->
-                
+                </div>
+
             </div>
         </div>
         

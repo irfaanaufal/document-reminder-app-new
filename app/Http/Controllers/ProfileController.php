@@ -3,62 +3,117 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
     public function edit(Request $request): View
     {
+        $user = $request->user();
+        $userApp = \App\Models\UserApplication::where('user_id', $user->id)
+            ->where('application_id', $this->resolveApplicationId())
+            ->first();
+
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
+            'userApp' => $userApp,
+            'isAppActive' => (bool) $userApp?->is_active,
         ]);
     }
 
-    /**
-     * Update the user's profile information.
-     */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        // 1. Mengisi data objek user dengan data yang sudah lolos validasi
-        $request->user()->fill($request->validated());
+        $data = $request->validated();
+        $data['name'] = $data['nama'];
+        unset($data['nama']);
+        unset($data['current_password']);
 
-        // 2. Jika email diganti, batalkan status verifikasi email lama
+        $request->user()->fill($data);
+
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
 
-        // 3. Simpan perubahan ke dalam database
         $request->user()->save();
 
-        // 4. TARO DI SINI: Kembalikan ke halaman edit profil sambil membawa flash session 'success'
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
-    /**
-     * Delete the user's account.
-     */
-    public function destroy(Request $request): RedirectResponse
+    public function toggleAccess(Request $request): RedirectResponse
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
+        $user = $request->user();
+        $appId = $this->resolveApplicationId();
+
+        $userApp = \App\Models\UserApplication::where('user_id', $user->id)
+            ->where('application_id', $appId)
+            ->first();
+
+        if (! $userApp) {
+            $userApp = \App\Models\UserApplication::create([
+                'user_id' => $user->id,
+                'application_id' => $appId,
+                'is_active' => false,
+            ]);
+        }
+
+        // Aktivasi hanya via approval tim IT (Kelola Permintaan di it-system).
+        if (! $userApp->is_active) {
+            return Redirect::route('profile.edit')->withErrors([
+                'access' => 'Akses hanya dapat diaktifkan oleh tim IT.',
+            ]);
+        }
+
+        $userApp->is_active = false;
+        $userApp->save();
+
+        return Redirect::route('profile.edit')->with('success', 'Akses aplikasi berhasil dinonaktifkan.');
+    }
+
+    private function resolveApplicationId(): int
+    {
+        $configured = (int) config('app.application_id');
+        if ($configured > 0) {
+            return $configured;
+        }
+
+        $app = \App\Models\Application::find($configured)
+            ?? \App\Models\Application::firstOrCreate(
+                ['slug' => 'reminder'],
+                ['name' => 'Reminder', 'description' => 'Sistem pengingat dokumen.']
+            );
+
+        return (int) $app->id;
+    }
+
+    /**
+     * Upload / update avatar photo.
+     */
+    public function updateAvatar(Request $request): JsonResponse
+    {
+        $request->validate([
+            'avatar' => ['required', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:3000'],
         ]);
 
         $user = $request->user();
 
-        Auth::logout();
+        // Delete old avatar if exists
+        if ($user->avatar_path) {
+            Storage::disk('public')->delete($user->avatar_path);
+        }
 
-        $user->delete();
+        $path = $request->file('avatar')->store('profile-photos', 'public');
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        $user->avatar_path = $path;
+        $user->save();
 
-        return Redirect::to('/');
+        return response()->json([
+            'success' => true,
+            'avatar_url' => Storage::disk('public')->url($path),
+        ]);
     }
 }

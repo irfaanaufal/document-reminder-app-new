@@ -6,8 +6,51 @@
 	display: none !important;
 }
 
-/* Ensure datatable info is visible and the injected legend is aligned */
 /* Hide the default datatable info (showing x to y of z entries) */
 .datatable-info {
     display: none !important;
+}
+
+/* DataTable: flex layout so pagination stays visible */
+.datatable-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.datatable-container {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+}
+
+.datatable-bottom {
+    flex-shrink: 0;
+}
+
+/* Override simple-datatables library */
+.datatable-table {
+    border-collapse: collapse !important;
+}
+
+.datatable-table > thead > tr > th,
+.datatable-table > tbody > tr > td {
+    padding: 8px 16px !important;
+    vertical-align: middle !important;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.15s ease-out;
+}
+
+/* Suppress native search cancel button (custom X is used instead) */
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+    -webkit-appearance: none;
+    appearance: none;
 }

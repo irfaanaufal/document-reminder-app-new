@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\User;
+use App\Models\Application;
+use App\Models\UserApplication;
 
 test('profile page is displayed', function () {
     $user = User::factory()->create();
@@ -22,6 +24,7 @@ test('profile information can be updated', function () {
             'username' => $user->username,
             'no_telpon' => '081234567890',
             'email' => 'test@example.com',
+            'current_password' => 'password',
         ]);
 
     $response
@@ -45,6 +48,7 @@ test('email verification status is unchanged when the email address is unchanged
             'username' => $user->username,
             'no_telpon' => $user->no_telpon ?? '081234567890',
             'email' => $user->email,
+            'current_password' => 'password',
         ]);
 
     $response
@@ -54,7 +58,7 @@ test('email verification status is unchanged when the email address is unchanged
     $this->assertNotNull($user->refresh()->email_verified_at);
 });
 
-test('user can delete their account', function () {
+test('delete profile route no longer exists', function () {
     $user = User::factory()->create();
 
     $response = $this
@@ -63,27 +67,70 @@ test('user can delete their account', function () {
             'password' => 'password',
         ]);
 
-    $response
-        ->assertSessionHasNoErrors()
-        ->assertRedirect('/');
-
-    $this->assertGuest();
-    $this->assertNull($user->fresh());
+    $response->assertStatus(405);
+    $this->assertNotNull($user->fresh());
 });
 
-test('correct password must be provided to delete account', function () {
+test('user can deactivate own application access', function () {
     $user = User::factory()->create();
+    $app = Application::firstOrCreate(
+        ['slug' => 'reminder'],
+        ['name' => 'Reminder', 'description' => 'Sistem pengingat dokumen.']
+    );
+    $userApp = UserApplication::firstOrCreate(
+        ['user_id' => $user->id, 'application_id' => $app->id],
+        ['is_active' => true, 'approved_by' => $user->id, 'approved_at' => now()]
+    );
 
     $response = $this
         ->actingAs($user)
-        ->from('/profile')
-        ->delete('/profile', [
-            'password' => 'wrong-password',
-        ]);
+        ->patch('/profile/access');
 
     $response
-        ->assertSessionHasErrorsIn('userDeletion', 'password')
+        ->assertSessionHasNoErrors()
         ->assertRedirect('/profile');
 
-    $this->assertNotNull($user->fresh());
+    $userApp->refresh();
+    $this->assertFalse($userApp->is_active);
+    $this->assertSame($user->id, $userApp->approved_by);
+    $this->assertNotNull($userApp->approved_at);
+});
+
+test('user cannot reactivate own application access while logged in', function () {
+    $user = User::factory()->create();
+    $app = Application::firstOrCreate(
+        ['slug' => 'reminder'],
+        ['name' => 'Reminder', 'description' => 'Sistem pengingat dokumen.']
+    );
+    $userApp = UserApplication::firstOrCreate(
+        ['user_id' => $user->id, 'application_id' => $app->id],
+        ['is_active' => false]
+    );
+
+    $this->actingAs($user)
+        ->patch('/profile/access')
+        ->assertRedirect('/profile')
+        ->assertSessionHasErrors('access');
+
+    $this->assertFalse($userApp->fresh()->is_active);
+});
+
+test('toggle access creates pending row without activating', function () {
+    $user = User::factory()->create();
+    $app = Application::firstOrCreate(
+        ['slug' => 'reminder'],
+        ['name' => 'Reminder', 'description' => 'Sistem pengingat dokumen.']
+    );
+
+    $this->actingAs($user)
+        ->patch('/profile/access')
+        ->assertRedirect('/profile')
+        ->assertSessionHasErrors('access');
+
+    $userApp = UserApplication::where('user_id', $user->id)
+        ->where('application_id', $app->id)
+        ->first();
+
+    $this->assertNotNull($userApp);
+    $this->assertFalse($userApp->is_active);
 });
