@@ -1,18 +1,21 @@
 # ============================================================
-# CRON CONFIG — reminder-app Scheduler
+# CRON CONFIG — reminder-app Scheduler (aaPanel)
 # Jalankan di server sebagai root
 # ============================================================
 
-# Tambah cron job untuk reminder-app scheduler
-# Jalankan: bash setup-cron.sh
+set -euo pipefail
+
+APP_DIR=/www/wwwroot/sindangasih-makmur.com/reminder-app
+PHP83=/www/server/php/83/bin/php
 
 echo "Setting up cron job for reminder-app..."
 
-# Hapus cron lama untuk reminder-app (jika ada)
-crontab -l 2>/dev/null | grep -v "reminder-app" | crontab - 2>/dev/null || true
-
-# Tambah cron baru
-(crontab -l 2>/dev/null; echo "* * * * * cd /var/www/reminder-app && php artisan schedule:run >> /dev/null 2>&1") | crontab -
+# Ambil crontab lama, buang baris reminder-app lama, tambah baris baru
+CRON_TMP=$(mktemp)
+crontab -l 2>/dev/null | grep -v "reminder-app" > "$CRON_TMP" || true
+echo "* * * * * cd $APP_DIR && $PHP83 artisan schedule:run >> /dev/null 2>&1" >> "$CRON_TMP"
+crontab "$CRON_TMP"
+rm -f "$CRON_TMP"
 
 echo "Cron job added successfully."
 echo ""
