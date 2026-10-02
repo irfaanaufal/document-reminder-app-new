@@ -67,31 +67,12 @@ Route::middleware(['auth', 'applications.access', 'throttle:30,1'])->group(funct
                 $today
             );
 
-            $reminders = $remindersQuery->get()->sort(function ($a, $b) use ($today) {
-            $aNull = $a->tanggal_expired === null;
-            $bNull = $b->tanggal_expired === null;
-            if ($aNull !== $bNull) {
-                return $aNull <=> $bNull;
-            }
-            if (! $aNull) {
-                $aExpired = $a->tanggal_expired->copy()->startOfDay();
-                $bExpired = $b->tanggal_expired->copy()->startOfDay();
-                $aPast = $aExpired->lt($today->copy()->startOfDay());
-                $bPast = $bExpired->lt($today->copy()->startOfDay());
-                if ($aPast !== $bPast) {
-                    return $aPast <=> $bPast;
-                }
-                $months = max(1, (int) ($a->reminder_bulan ?? 3));
-                $aDue = $today->copy()->startOfDay()->gte($aExpired->copy()->subMonthsNoOverflow($months));
-                $bMonths = max(1, (int) ($b->reminder_bulan ?? 3));
-                $bDue = $today->copy()->startOfDay()->gte($bExpired->copy()->subMonthsNoOverflow($bMonths));
-                if ($aDue !== $bDue) {
-                    return $aDue <=> $bDue;
-                }
-            }
+            $reminders = $remindersQuery->get()->sort(function ($a, $b) {
+                $aTs = $a->tanggal_expired?->getTimestamp() ?? PHP_INT_MAX;
+                $bTs = $b->tanggal_expired?->getTimestamp() ?? PHP_INT_MAX;
 
-            return ($a->tanggal_expired?->getTimestamp() ?? PHP_INT_MAX) <=> ($b->tanggal_expired?->getTimestamp() ?? PHP_INT_MAX);
-        })->values();
+                return [$aTs <=> $bTs, $b->id <=> $a->id];
+            })->values();
 
         return view('doc.read', [
             'reminders' => $reminders,
