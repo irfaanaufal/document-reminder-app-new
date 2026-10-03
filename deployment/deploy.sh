@@ -17,7 +17,7 @@ APP_DIR="$ROOT/reminder-app"
 BACKUP_DIR="$ROOT/reminder-app-backup"
 PHP83=/www/server/php/83/bin/php
 WEB_USER=www
-EXPECTED_URL=https://sindangasih-makmur.com/reminder-app
+EXPECTED_URL=http://sindangasih-makmur.com/reminder-app
 
 echo "============================================"
 echo "  REMINDER-APP DEPLOYMENT (aaPanel)"
@@ -115,11 +115,10 @@ chmod -R 775 "$APP_DIR/storage" "$APP_DIR/bootstrap/cache"
 "$PHP83" artisan view:cache
 "$PHP83" artisan storage:link --force
 
-# ---- 6. MIGRATE (migration pakai guard hasTable/hasColumn = idempoten) --------
+# ---- 6. MIGRATE (DINONAKTIFKAN — skema server dibangun via dump) --------------
 echo ""
-echo "[6/8] Migrate..."
-"$PHP83" artisan migrate --force
-"$PHP83" artisan migrate:status | tail -12
+echo "[6/8] Migrate DILEWATI (sengaja — 27 migrasi tak tercatat, jalankan manual bila ada migrasi baru):"
+echo "       1) backup DB   2) $PHP83 artisan migrate --force --path=database/migrations/<file_baru>.php"
 
 # ---- 7. CRON SCHEDULER ---------------------------------------------------------
 echo ""
