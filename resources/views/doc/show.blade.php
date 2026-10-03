@@ -57,103 +57,107 @@
             <p class="mt-1 text-sm text-gray-500 dark:text-zinc-400">{{ $reminder->penerbit_tujuan ?? 'Penerbit' }}</p>
         </div>
 
-        {{-- ===== Informasi Dokumen ===== --}}
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm">
-            <h3 class="text-base font-bold text-gray-900 dark:text-zinc-100 mb-6">Informasi Dokumen</h3>
-            <dl class="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-6">
-                <div>
-                    <dt class="text-xs font-normal text-gray-500 dark:text-zinc-400">No Dokumen</dt>
-                    <dd class="mt-1.5 text-xs font-bold text-gray-900 dark:text-zinc-100 leading-tight">{{ $reminder->no_dokumen }}</dd>
-                </div>
-                <div>
-                    <dt class="text-xs font-normal text-gray-500 dark:text-zinc-400">Jenis Dokumen</dt>
-                    <dd class="mt-1.5 text-xs font-bold text-gray-900 dark:text-zinc-100 leading-tight">{{ $reminder->jenis_dokumen_label }}</dd>
-                </div>
-                <div>
-                    <dt class="text-xs font-normal text-gray-500 dark:text-zinc-400">Penerbit / Tujuan</dt>
-                    <dd class="mt-1.5 text-xs font-bold text-gray-900 dark:text-zinc-100 leading-tight">{{ $reminder->penerbit_tujuan }}</dd>
-                </div>
-                <div>
-                    <dt class="text-xs font-normal text-gray-500 dark:text-zinc-400">Tanggal Terbit</dt>
-                    <dd class="mt-1.5 text-xs font-bold text-gray-900 dark:text-zinc-100 leading-tight">{{ $reminder->tanggal_terbit?->translatedFormat('d F Y') ?? '-' }}</dd>
-                </div>
-                <div>
-                    <dt class="text-xs font-normal text-gray-500 dark:text-zinc-400">Tanggal Expired</dt>
-                    <dd class="mt-1.5 text-xs font-bold text-gray-900 dark:text-zinc-100 leading-tight">{{ $expired ? $expired->translatedFormat('d F Y') : 'Seumur Hidup' }}</dd>
-                </div>
-                <div>
-                    <dt class="text-xs font-normal text-gray-500 dark:text-zinc-400">Sisa Waktu</dt>
-                    <dd class="mt-1.5 text-xs font-bold {{ $sisaHariColor }} leading-tight">{{ $sisaHariText }}</dd>
-                </div>
-                <div>
-                    <dt class="text-xs font-normal text-gray-500 dark:text-zinc-400">Interval Reminder</dt>
-                    <dd class="mt-1.5 text-xs font-bold text-gray-900 dark:text-zinc-100 leading-tight">{{ $reminder->reminder_bulan ? $reminder->reminder_bulan . ' bulan sebelum expired' : '-' }}</dd>
-                </div>
-                <div>
-                    <dt class="text-xs font-normal text-gray-500 dark:text-zinc-400">Dibuat Oleh</dt>
-                    <dd class="mt-1.5 text-xs font-bold text-gray-900 dark:text-zinc-100 leading-tight">{{ $reminder->user?->nama ?? '-' }}</dd>
-                </div>
-                <div>
-                    <dt class="text-xs font-normal text-gray-500 dark:text-zinc-400">Tanggal Input</dt>
-                    <dd class="mt-1.5 text-xs font-bold text-gray-900 dark:text-zinc-100 leading-tight">{{ $reminder->created_at->translatedFormat('d F Y, H:i') }}</dd>
-                </div>
-                <div>
-                    <dt class="text-xs font-normal text-gray-500 dark:text-zinc-400">Terakhir Diupdate</dt>
-                    <dd class="mt-1.5 text-xs font-bold text-gray-900 dark:text-zinc-100 leading-tight">{{ $reminder->updated_at->translatedFormat('d F Y, H:i') }}</dd>
-                </div>
-            </dl>
-        </div>
+        {{-- ===== Informasi Dokumen + PIC (grid 2) ===== --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
 
-        {{-- ===== PIC Internal & PIC External ===== --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-            {{-- Kartu: PIC Internal --}}
+            {{-- Kolom kiri: Informasi Dokumen --}}
             <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm">
-                <h3 class="text-base font-bold text-gray-900 dark:text-zinc-100 mb-4">PIC Internal</h3>
-                @if($pics->isNotEmpty())
-                    <div class="space-y-2">
-                        @foreach($pics as $pic)
-                            <div class="flex items-center gap-3 p-3 rounded-2xl bg-[#eeeef0] dark:bg-zinc-800">
-                                @if(!empty($pic->avatar_url ?? $pic->profile_photo_url))
-                                    <img src="{{ $pic->avatar_url ?? $pic->profile_photo_url }}"
-                                         alt="{{ $pic->pivot->nama ?? $pic->nama }}"
-                                         class="h-10 w-10 rounded-full object-cover shrink-0">
-                                @else
-                                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-[#a38380] text-xs font-bold text-white shrink-0">
-                                        {{ strtoupper(substr($pic->nama ?? $pic->pivot->nama ?? 'N', 0, 1)) }}
+                <h3 class="text-base font-bold text-gray-900 dark:text-zinc-100 mb-6">Informasi Dokumen</h3>
+                <dl class="grid grid-cols-2 gap-x-6 gap-y-6">
+                    <div>
+                        <dt class="text-xs font-normal text-gray-500 dark:text-zinc-400">No Dokumen</dt>
+                        <dd class="mt-1.5 text-xs font-bold text-gray-900 dark:text-zinc-100 leading-tight">{{ $reminder->no_dokumen }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-normal text-gray-500 dark:text-zinc-400">Jenis Dokumen</dt>
+                        <dd class="mt-1.5 text-xs font-bold text-gray-900 dark:text-zinc-100 leading-tight">{{ $reminder->jenis_dokumen_label }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-normal text-gray-500 dark:text-zinc-400">Penerbit / Tujuan</dt>
+                        <dd class="mt-1.5 text-xs font-bold text-gray-900 dark:text-zinc-100 leading-tight">{{ $reminder->penerbit_tujuan }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-normal text-gray-500 dark:text-zinc-400">Tanggal Terbit</dt>
+                        <dd class="mt-1.5 text-xs font-bold text-gray-900 dark:text-zinc-100 leading-tight">{{ $reminder->tanggal_terbit?->translatedFormat('d F Y') ?? '-' }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-normal text-gray-500 dark:text-zinc-400">Tanggal Expired</dt>
+                        <dd class="mt-1.5 text-xs font-bold text-gray-900 dark:text-zinc-100 leading-tight">{{ $expired ? $expired->translatedFormat('d F Y') : 'Seumur Hidup' }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-normal text-gray-500 dark:text-zinc-400">Sisa Waktu</dt>
+                        <dd class="mt-1.5 text-xs font-bold {{ $sisaHariColor }} leading-tight">{{ $sisaHariText }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-normal text-gray-500 dark:text-zinc-400">Interval Reminder</dt>
+                        <dd class="mt-1.5 text-xs font-bold text-gray-900 dark:text-zinc-100 leading-tight">{{ $reminder->reminder_bulan ? $reminder->reminder_bulan . ' bulan sebelum expired' : '-' }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-normal text-gray-500 dark:text-zinc-400">Dibuat Oleh</dt>
+                        <dd class="mt-1.5 text-xs font-bold text-gray-900 dark:text-zinc-100 leading-tight">{{ $reminder->user?->nama ?? '-' }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-normal text-gray-500 dark:text-zinc-400">Tanggal Input</dt>
+                        <dd class="mt-1.5 text-xs font-bold text-gray-900 dark:text-zinc-100 leading-tight">{{ $reminder->created_at->translatedFormat('d F Y, H:i') }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-normal text-gray-500 dark:text-zinc-400">Terakhir Diupdate</dt>
+                        <dd class="mt-1.5 text-xs font-bold text-gray-900 dark:text-zinc-100 leading-tight">{{ $reminder->updated_at->translatedFormat('d F Y, H:i') }}</dd>
+                    </div>
+                </dl>
+            </div>
+
+            {{-- Kolom kanan: PIC Internal & External (stack) --}}
+            <div class="flex flex-col gap-5">
+
+                {{-- Kartu: PIC Internal --}}
+                <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm">
+                    <h3 class="text-base font-bold text-gray-900 dark:text-zinc-100 mb-4">PIC Internal</h3>
+                    @if($pics->isNotEmpty())
+                        <div class="space-y-2">
+                            @foreach($pics as $pic)
+                                <div class="flex items-center gap-3 p-3 rounded-2xl bg-[#eeeef0] dark:bg-zinc-800">
+                                    @if(!empty($pic->avatar_url ?? $pic->profile_photo_url))
+                                        <img src="{{ $pic->avatar_url ?? $pic->profile_photo_url }}"
+                                             alt="{{ $pic->pivot->nama ?? $pic->nama }}"
+                                             class="h-10 w-10 rounded-full object-cover shrink-0">
+                                    @else
+                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-[#a38380] text-xs font-bold text-white shrink-0">
+                                            {{ strtoupper(substr($pic->nama ?? $pic->pivot->nama ?? 'N', 0, 1)) }}
+                                        </div>
+                                    @endif
+
+                                    <div class="min-w-0">
+                                        <p class="text-xs font-bold text-gray-900 dark:text-zinc-100 truncate">{{ $pic->pivot->nama ?? $pic->nama }}</p>
+                                        <p class="text-[11px] text-gray-500 dark:text-zinc-400 truncate mt-0.5">{{ $pic->pivot->email ?? $pic->email ?: '-' }}</p>
                                     </div>
-                                @endif
-
-                                <div class="min-w-0">
-                                    <p class="text-xs font-bold text-gray-900 dark:text-zinc-100 truncate">{{ $pic->pivot->nama ?? $pic->nama }}</p>
-                                    <p class="text-[11px] text-gray-500 dark:text-zinc-400 truncate mt-0.5">{{ $pic->pivot->email ?? $pic->email ?: '-' }}</p>
                                 </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-sm text-gray-400 italic">Tidak ada PIC Internal.</p>
+                    @endif
+                </div>
+
+                {{-- Kartu: PIC External --}}
+                <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm">
+                    <h3 class="text-base font-bold text-gray-900 dark:text-zinc-100 mb-4">PIC External</h3>
+                    @if($reminder->pic_external_nama)
+                        <div class="flex items-center gap-3 p-3 rounded-2xl bg-[#eeeef0] dark:bg-zinc-800">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-[#a38380] text-xs font-bold text-white shrink-0">
+                                {{ strtoupper(substr($reminder->pic_external_nama, 0, 1)) }}
                             </div>
-                        @endforeach
-                    </div>
-                @else
-                    <p class="text-sm text-gray-400 italic">Tidak ada PIC Internal.</p>
-                @endif
-            </div>
-
-            {{-- Kartu: PIC External --}}
-            <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm">
-                <h3 class="text-base font-bold text-gray-900 dark:text-zinc-100 mb-4">PIC External</h3>
-                @if($reminder->pic_external_nama)
-                    <div class="flex items-center gap-3 p-3 rounded-2xl bg-[#eeeef0] dark:bg-zinc-800">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-[#a38380] text-xs font-bold text-white shrink-0">
-                            {{ strtoupper(substr($reminder->pic_external_nama, 0, 1)) }}
+                            <div class="min-w-0">
+                                <p class="text-xs font-bold text-gray-900 dark:text-zinc-100 truncate">{{ $reminder->pic_external_nama }}</p>
+                                <p class="text-[11px] text-gray-500 dark:text-zinc-400 truncate mt-0.5">{{ $reminder->pic_external_telpon ?: '-' }}</p>
+                            </div>
                         </div>
-                        <div class="min-w-0">
-                            <p class="text-xs font-bold text-gray-900 dark:text-zinc-100 truncate">{{ $reminder->pic_external_nama }}</p>
-                            <p class="text-[11px] text-gray-500 dark:text-zinc-400 truncate mt-0.5">{{ $reminder->pic_external_telpon ?: '-' }}</p>
-                        </div>
-                    </div>
-                @else
-                    <p class="text-sm text-gray-400 italic">Tidak ada PIC External.</p>
-                @endif
-            </div>
+                    @else
+                        <p class="text-sm text-gray-400 italic">Tidak ada PIC External.</p>
+                    @endif
+                </div>
 
+            </div>
         </div>
 
         {{-- ===== Lampiran Dokumen ===== --}}
