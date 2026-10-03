@@ -1,171 +1,56 @@
-<section>
-    <header>
-        <h2 class="text-lg font-medium text-slate-900 dark:text-zinc-100">
-            {{ __('Informasi Profil') }}
-        </h2>
+<form method="post" action="{{ route('profile.update') }}" class="flex flex-1 flex-col gap-4">
+    @csrf
+    @method('patch')
 
-        <p class="mt-1 text-sm text-slate-600 dark:text-zinc-400">
-            {{ __("Perbarui informasi profil akun, nomor telepon, dan alamat email Anda.") }}
-        </p>
-    </header>
-
-    <!-- Avatar Upload Section -->
-    <div class="mt-6 p-4 bg-slate-50 dark:bg-zinc-800 rounded-xl">
-        <label class="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-3">Foto Profil</label>
-        <div class="flex items-center gap-4">
-            <div id="avatar-preview" class="w-16 h-16 rounded-2xl overflow-hidden bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-white text-2xl font-bold shrink-0">
-                @if(Auth::user()->avatar_path)
-                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url(Auth::user()->avatar_path) }}" alt="Avatar" class="w-full h-full object-cover">
-                @else
-                    {{ substr(Auth::user()->nama ?? 'U', 0, 2) }}
-                @endif
-            </div>
-            <div>
-                <label for="avatar-input" class="cursor-pointer inline-flex items-center px-4 py-2 bg-slate-800 dark:bg-white dark:text-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-700 transition">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                    Ubah Foto
-                </label>
-                <input type="file" id="avatar-input" accept="image/jpeg,image/png,image/jpg,image/webp,image/gif" class="hidden">
-                <p class="text-xs text-slate-500 dark:text-zinc-400 mt-1">Maks 3MB (JPG, PNG, WebP, GIF)</p>
-            </div>
-        </div>
-        <div id="avatar-status" class="mt-2 text-sm hidden"></div>
-    </div>
-
-    <script>
-    document.getElementById('avatar-input').addEventListener('change', function(input) {
-        var file = input.target.files[0];
-        if (!file) return;
-
-        if (file.size > 3 * 1024 * 1024) {
-            alert('Ukuran file maksimal 3MB');
-            input.target.value = '';
-            return;
-        }
-
-        var preview = document.getElementById('avatar-preview');
-        var status = document.getElementById('avatar-status');
-
-        // Preview
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            preview.innerHTML = '<img src="' + e.target.result + '" alt="Avatar" class="w-full h-full object-cover">';
-        };
-        reader.readAsDataURL(file);
-
-        // Upload
-        var formData = new FormData();
-        formData.append('avatar', file);
-
-        status.textContent = 'Mengupload...';
-        status.className = 'mt-2 text-sm text-slate-500';
-
-        fetch('{{ route("profile.avatar") }}', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Accept': 'application/json',
-            },
-        })
-        .then(function(res) {
-            if (!res.ok) {
-                status.textContent = 'Gagal mengupload foto.';
-                status.className = 'mt-2 text-sm text-red-600';
-                throw new Error('Upload failed');
-            }
-            return res.json();
-        })
-        .then(function(data) {
-            if (data.success) {
-                preview.innerHTML = '<img src="' + data.avatar_url + '" alt="Avatar" class="w-full h-full object-cover">';
-                status.textContent = 'Berhasil diupload!';
-                status.className = 'mt-2 text-sm text-emerald-600';
-            } else {
-                status.textContent = 'Gagal mengupload foto.';
-                status.className = 'mt-2 text-sm text-red-600';
-            }
-        })
-        .catch(function(err) {
-            status.textContent = 'Gagal mengupload foto.';
-            status.className = 'mt-2 text-sm text-red-600';
-        });
-
-        input.target.value = '';
-    });
-    </script>
-
-    <form id="send-verification" method="post" action="{{ route('verification.send') }}">
-        @csrf
-    </form>
-
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
-        @csrf
-        @method('patch')
-
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
-            <x-input-label for="nama" :value="__('Nama')" />
-            <x-text-input id="nama" name="nama" type="text" class="mt-1 block w-full" :value="old('nama', $user->nama)" required autofocus autocomplete="name" />
-            <x-input-error class="mt-2" :messages="$errors->get('nama')" />
+            <label for="nama" class="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-400">{{ __('Nama Lengkap') }}</label>
+            <input id="nama" name="nama" type="text" required autocomplete="name"
+                value="{{ old('nama', $user->nama) }}"
+                class="w-full rounded-md border border-neutral-200 bg-neutral-50 px-3.5 py-2.5 text-sm text-neutral-900 placeholder-neutral-300 outline-none transition-all focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 dark:border-neutral-700 dark:bg-[#2d2d2d] dark:text-neutral-50 dark:placeholder-neutral-500 dark:focus:border-white dark:focus:ring-white">
+            @error('nama')
+                <p class="mt-1.5 text-[10px] font-bold text-red-500">{{ $message }}</p>
+            @enderror
         </div>
 
         <div>
-            <x-input-label for="username" :value="__('Username')" />
-            <x-text-input id="username" name="username" type="text" class="mt-1 block w-full" :value="old('username', $user->username)" required autocomplete="username" />
-            <x-input-error class="mt-2" :messages="$errors->get('username')" />
-        </div>
-
-        <div>
-            <x-input-label for="no_telpon" :value="__('Nomor Telepon')" />
-            <x-text-input id="no_telpon" name="no_telpon" type="tel" class="mt-1 block w-full" :value="old('no_telpon', $user->no_telpon)" required autocomplete="tel" />
-            <x-input-error class="mt-2" :messages="$errors->get('no_telpon')" />
-        </div>
-
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
-            <x-input-error class="mt-2" :messages="$errors->get('email')" />
+            <label for="email" class="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-400">{{ __('Alamat Email') }}</label>
+            <input id="email" name="email" type="email" required autocomplete="username"
+                value="{{ old('email', $user->email) }}"
+                class="w-full rounded-md border border-neutral-200 bg-neutral-50 px-3.5 py-2.5 text-sm text-neutral-900 placeholder-neutral-300 outline-none transition-all focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 dark:border-neutral-700 dark:bg-[#2d2d2d] dark:text-neutral-50 dark:placeholder-neutral-500 dark:focus:border-white dark:focus:ring-white">
+            @error('email')
+                <p class="mt-1.5 text-[10px] font-bold text-red-500">{{ $message }}</p>
+            @enderror
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                 <div>
-                    <p class="text-sm mt-2 text-slate-800 dark:text-zinc-200">
+                    <p class="mt-2 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
                         {{ __('Alamat email Anda belum terverifikasi.') }}
 
-                        <button form="send-verification" class="underline text-sm text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">
+                        <button form="send-verification" class="font-semibold text-neutral-700 underline rounded-md hover:text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900 dark:text-neutral-300 dark:hover:text-white">
                             {{ __('Klik di sini untuk mengirim ulang email verifikasi.') }}
                         </button>
                     </p>
 
                     @if (session('status') === 'verification-link-sent')
-                        <p class="mt-2 font-medium text-sm text-emerald-600">
+                        <p class="mt-2 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
                             {{ __('Tautan verifikasi baru telah dikirim ke alamat email Anda.') }}
                         </p>
                     @endif
                 </div>
             @endif
         </div>
+    </div>
 
-        <div>
-            <x-input-label for="current_password" :value="__('Password Saat Ini')" />
-            <x-text-input id="current_password" name="current_password" type="password" class="mt-1 block w-full" placeholder="Masukkan password untuk menyimpan perubahan" required autocomplete="current-password" />
-            <x-input-error class="mt-2" :messages="$errors->get('current_password')" />
-        </div>
+    <div class="mt-auto flex items-center justify-end gap-4 pt-1">
+        <button type="submit" class="rounded-lg bg-neutral-900 px-5 py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-neutral-800 active:scale-[0.98] disabled:opacity-50 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100">
+            {{ __('Simpan') }}
+        </button>
 
-        <div class="flex items-center gap-4">
-            <x-primary-button class="bg-slate-800 hover:bg-slate-900 focus:bg-slate-900 active:bg-slate-950 focus:ring-slate-500 shadow-md">
-                {{ __('Simpan') }}
-            </x-primary-button>
-
-            @if (session('status') === 'profile-updated')
-                <p class="text-sm font-semibold text-emerald-600 animate-pulse flex items-center gap-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-                    </svg>
-                    {{ __('Perubahan berhasil disimpan!') }}
-                </p>
-            @endif
-        </div>
-    </form>
-</section>
+        @if (session('status') === 'profile-updated')
+            <p x-data="{ show: true }" x-show="show" x-transition.opacity
+               x-init="setTimeout(() => show = false, 3000)"
+               class="text-xs font-semibold text-neutral-400 dark:text-neutral-400">Tersimpan.</p>
+        @endif
+    </div>
+</form>

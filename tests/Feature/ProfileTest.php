@@ -21,10 +21,7 @@ test('profile information can be updated', function () {
         ->actingAs($user)
         ->patch('/profile', [
             'nama' => 'Test User',
-            'username' => $user->username,
-            'no_telpon' => '081234567890',
             'email' => 'test@example.com',
-            'current_password' => 'password',
         ]);
 
     $response
@@ -38,6 +35,28 @@ test('profile information can be updated', function () {
     $this->assertNull($user->email_verified_at);
 });
 
+test('username and phone are read-only and cannot be updated via profile form', function () {
+    $user = User::factory()->create();
+
+    $response = $this
+        ->actingAs($user)
+        ->patch('/profile', [
+            'nama' => 'Test User',
+            'email' => $user->email,
+            'username' => 'hackedname',
+            'no_telpon' => '089999999999',
+        ]);
+
+    $response
+        ->assertSessionHasNoErrors()
+        ->assertRedirect('/profile');
+
+    $user->refresh();
+
+    $this->assertNotSame('hackedname', $user->username);
+    $this->assertNotSame('089999999999', $user->no_telpon);
+});
+
 test('email verification status is unchanged when the email address is unchanged', function () {
     $user = User::factory()->create();
 
@@ -45,10 +64,7 @@ test('email verification status is unchanged when the email address is unchanged
         ->actingAs($user)
         ->patch('/profile', [
             'nama' => 'Test User',
-            'username' => $user->username,
-            'no_telpon' => $user->no_telpon ?? '081234567890',
             'email' => $user->email,
-            'current_password' => 'password',
         ]);
 
     $response

@@ -1,48 +1,45 @@
-<section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900 dark:text-zinc-100">
-            {{ __('Update Password') }}
-        </h2>
+<form method="post" action="{{ route('password.update') }}" class="flex flex-1 flex-col gap-4">
+    @csrf
+    @method('put')
 
-        <p class="mt-1 text-sm text-gray-600 dark:text-zinc-400">
-            {{ __('Pastikan akun Anda menggunakan kata sandi yang panjang dan acak agar tetap aman.') }}
-        </p>
-    </header>
-
-    <form method="post" action="{{ route('password.update') }}" class="mt-6 space-y-6">
-        @csrf
-        @method('put')
-
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
-            <x-input-label for="update_password_current_password" :value="__('Kata Sandi Saat Ini')" />
-            <x-text-input id="update_password_current_password" name="current_password" type="password" class="mt-1 block w-full" autocomplete="current-password" />
-            <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
+            <label for="update_password_current_password" class="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-400">{{ __('Password Sekarang') }}</label>
+            <input id="update_password_current_password" name="current_password" type="password" autocomplete="current-password"
+                class="w-full rounded-md border border-neutral-200 bg-neutral-50 px-3.5 py-2.5 text-sm text-neutral-900 placeholder-neutral-300 outline-none transition-all focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 dark:border-neutral-700 dark:bg-[#2d2d2d] dark:text-neutral-50 dark:placeholder-neutral-500 dark:focus:border-white dark:focus:ring-white">
+            @foreach ($errors->updatePassword->get('current_password') ?? [] as $message)
+                <p class="mt-1.5 text-[10px] font-bold text-red-500">{{ $message }}</p>
+            @endforeach
         </div>
 
         <div>
-            <x-input-label for="update_password_password" :value="__('Kata Sandi Baru')" />
-            <x-text-input id="update_password_password" name="password" type="password" class="mt-1 block w-full" autocomplete="new-password" />
-            <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
+            <label for="update_password_password" class="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-400">{{ __('Password Baru') }}</label>
+            <input id="update_password_password" name="password" type="password" autocomplete="new-password"
+                class="w-full rounded-md border border-neutral-200 bg-neutral-50 px-3.5 py-2.5 text-sm text-neutral-900 placeholder-neutral-300 outline-none transition-all focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 dark:border-neutral-700 dark:bg-[#2d2d2d] dark:text-neutral-50 dark:placeholder-neutral-500 dark:focus:border-white dark:focus:ring-white">
+            @foreach ($errors->updatePassword->get('password') ?? [] as $message)
+                <p class="mt-1.5 text-[10px] font-bold text-red-500">{{ $message }}</p>
+            @endforeach
         </div>
 
-        <div>
-            <x-input-label for="update_password_password_confirmation" :value="__('Konfirmasi Kata Sandi')" />
-            <x-text-input id="update_password_password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" />
-            <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
+        <div class="md:col-span-2">
+            <label for="update_password_password_confirmation" class="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-400">{{ __('Konfirmasi Password') }}</label>
+            <input id="update_password_password_confirmation" name="password_confirmation" type="password" autocomplete="new-password"
+                class="w-full rounded-md border border-neutral-200 bg-neutral-50 px-3.5 py-2.5 text-sm text-neutral-900 placeholder-neutral-300 outline-none transition-all focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 dark:border-neutral-700 dark:bg-[#2d2d2d] dark:text-neutral-50 dark:placeholder-neutral-500 dark:focus:border-white dark:focus:ring-white">
+            @foreach ($errors->updatePassword->get('password_confirmation') ?? [] as $message)
+                <p class="mt-1.5 text-[10px] font-bold text-red-500">{{ $message }}</p>
+            @endforeach
         </div>
+    </div>
 
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Simpan') }}</x-primary-button>
+    <div class="mt-auto flex items-center gap-4 pt-1">
+        <button type="submit" class="rounded-lg bg-neutral-900 px-5 py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-neutral-800 active:scale-[0.98] disabled:opacity-50 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100">
+            {{ __('Perbarui Password') }}
+        </button>
 
-            @if (session('status') === 'password-updated')
-                <p
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-transition
-                    x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600 dark:text-zinc-400"
-                >{{ __('Saved.') }}</p>
-            @endif
-        </div>
-    </form>
-</section>
+        @if (session('status') === 'password-updated')
+            <p x-data="{ show: true }" x-show="show" x-transition.opacity
+               x-init="setTimeout(() => show = false, 3000)"
+               class="text-xs font-semibold text-neutral-400 dark:text-neutral-400">Tersimpan.</p>
+        @endif
+    </div>
+</form>

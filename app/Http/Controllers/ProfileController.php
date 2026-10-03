@@ -19,10 +19,22 @@ class ProfileController extends Controller
             ->where('application_id', $this->resolveApplicationId())
             ->first();
 
+        $today = now()->startOfDay()->toDateString();
+
         return view('profile.edit', [
             'user' => $user,
             'userApp' => $userApp,
             'isAppActive' => (bool) $userApp?->is_active,
+            'stats' => [
+                'total' => \App\Models\DocumentReminder::count(),
+                'segera_habis' => \App\Models\DocumentReminder::whereNotNull('tanggal_expired')
+                    ->whereBetween('tanggal_expired', [$today, now()->startOfDay()->addDays(30)->toDateString()])
+                    ->count(),
+                'kadaluarsa' => \App\Models\DocumentReminder::whereNotNull('tanggal_expired')
+                    ->where('tanggal_expired', '<', $today)
+                    ->count(),
+                'tanpa_expiry' => \App\Models\DocumentReminder::whereNull('tanggal_expired')->count(),
+            ],
         ]);
     }
 
@@ -31,7 +43,6 @@ class ProfileController extends Controller
         $data = $request->validated();
         $data['name'] = $data['nama'];
         unset($data['nama']);
-        unset($data['current_password']);
 
         $request->user()->fill($data);
 

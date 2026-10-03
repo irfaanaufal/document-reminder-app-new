@@ -13,20 +13,6 @@ class ProfileUpdateRequest extends FormRequest
     {
         return [
             'nama' => ['required', 'string', 'max:255'],
-            'username' => [
-                'required',
-                'string',
-                'lowercase',
-                'max:255',
-                'alpha_dash',
-                Rule::unique(User::class)->ignore($this->user()->id),
-            ],
-            'no_telpon' => [
-                'required',
-                'string',
-                'max:20',
-                Rule::unique(User::class)->ignore($this->user()->id),
-            ],
             'email' => [
                 'required',
                 'string',
@@ -35,7 +21,6 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
-            'current_password' => ['required', 'current_password'],
         ];
     }
 }
