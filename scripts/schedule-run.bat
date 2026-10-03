@@ -1,6 +1,6 @@
 @echo off
 setlocal EnableExtensions
-REM Dipanggil Windows Task Scheduler: Senin-Sabtu, 08:30-10:00 WIB (tiap 1 menit).
+REM Dipanggil Windows Task Scheduler: Senin-Sabtu, 09:45-11:00 WIB (tiap 1 menit).
 REM Development: php artisan schedule:work (hentikan saat tidak dipakai).
 
 cd /d "%~dp0.."

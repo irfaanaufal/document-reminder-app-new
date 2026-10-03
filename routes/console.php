@@ -9,11 +9,13 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('reminders:queue')
-    ->dailyAt('08:30')
+    ->dailyAt('09:55')
+    ->days([1,2,3,4,5,6])
     ->withoutOverlapping()
     ->onOneServer();
 
 Schedule::command('reminders:send')
-    ->dailyAt('08:35')
+    ->dailyAt('10:00')
+    ->days([1,2,3,4,5,6])
     ->withoutOverlapping()
     ->onOneServer();

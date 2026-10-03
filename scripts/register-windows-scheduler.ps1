@@ -1,5 +1,5 @@
 # Daftarkan Laravel scheduler ke Windows Task Scheduler.
-# Aktif: Senin–Sabtu, 08:30–10:00 WIB (schedule:run tiap 1 menit dalam window itu).
+# Aktif: Senin–Sabtu, 09:45–11:00 WIB (schedule:run tiap 1 menit dalam window itu).
 #
 # Buka PowerShell sebagai Administrator, lalu:
 #   Set-ExecutionPolicy -Scope Process Bypass -Force
@@ -13,9 +13,9 @@ $BatPath = (Resolve-Path (Join-Path $PSScriptRoot "schedule-run.bat")).Path
 $PhpPathFile = Join-Path $PSScriptRoot "php-path.txt"
 $TaskName = "ReminderApp-LaravelScheduler"
 $LogDir = Join-Path $ProjectRoot "storage\logs"
-$StartTime = "08:30"
+$StartTime = "09:45"
 $RepeatMinutes = 1
-$Duration = "01:30"
+$Duration = "01:15"
 
 $php = Get-Command php -ErrorAction SilentlyContinue
 if (-not $php) {
@@ -49,11 +49,11 @@ Write-Host ""
 Write-Host "Berhasil! Task '$TaskName' aktif." -ForegroundColor Green
 Write-Host "Window Windows Task Scheduler:"
 Write-Host "  Hari   : Senin - Sabtu"
-Write-Host "  Jam    : $StartTime - 10:00 WIB (ulang tiap $RepeatMinutes menit)"
+Write-Host "  Jam    : $StartTime - 11:00 WIB (ulang tiap $RepeatMinutes menit)"
 Write-Host ""
 Write-Host "Jadwal reminder di aplikasi (routes/console.php):"
-Write-Host "  08:30 WIB -> reminders:queue  (setiap hari)"
-Write-Host "  08:35 WIB -> reminders:send   (setiap hari)"
+Write-Host "  09:55 WIB -> reminders:queue  (Senin-Sabtu)"
+Write-Host "  10:00 WIB -> reminders:send   (Senin-Sabtu)"
 Write-Host ""
 Write-Host "Cek log: $LogDir\scheduler.log dan scheduler-cron.log"
 Write-Host "Tes manual: cd $ProjectRoot; php artisan schedule:list"
