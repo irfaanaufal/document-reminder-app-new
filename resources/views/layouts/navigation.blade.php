@@ -69,34 +69,33 @@
             </ul>
         </div>
 
-        <div class="border-t border-gray-200 dark:border-zinc-800 mt-auto overflow-visible transition-all duration-200" :class="expanded ? 'px-4 py-4' : 'px-0 py-4'">
-            <div class="relative" x-data="{ userOpen: false }">
-                <button @click.stop="userOpen = !userOpen" class="w-full text-left flex items-center gap-3 transition-colors" :class="expanded ? 'px-0 justify-start' : 'px-0 justify-center'">
-                    <div class="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-white text-sm font-bold shrink-0">
+        <div class="border-t border-gray-200 dark:border-zinc-800 mt-auto transition-all duration-200" :class="expanded ? 'px-4 py-4' : 'px-0 py-4'">
+            <div class="flex flex-col gap-0.5">
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" title="Keluar" class="flex items-center h-11 rounded-2xl text-gray-400 dark:text-zinc-500 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition duration-150 w-full overflow-hidden" :class="expanded ? 'gap-3 px-3' : 'justify-center px-0'">
+                        <span class="shrink-0 w-[18px] flex justify-center">
+                            <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M8.5 10c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1" /><path d="M10.828.122A.5.5 0 0 1 11 .5V1h.5A1.5 1.5 0 0 1 13 2.5V15h1.5a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1H3V1.5a.5.5 0 0 1 .43-.495l7-1a.5.5 0 0 1 .398.117M11.5 2H11v13h1V2.5a.5.5 0 0 0-.5-.5M4 1.934V15h6V1.077z" /></svg>
+                        </span>
+                        <span x-show="expanded" x-cloak x-transition class="text-sm font-semibold whitespace-nowrap">Keluar</span>
+                    </button>
+                </form>
+
+                <a href="{{ route('profile.edit') }}" title="Profil"
+                   class="flex items-center h-11 rounded-2xl transition-all duration-150 overflow-hidden {{ request()->routeIs('profile.edit') ? 'bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50' : 'hover:bg-gray-50 dark:hover:bg-zinc-900/40' }}"
+                   :class="expanded ? 'gap-3 px-3' : 'justify-center px-0'">
+                    <div class="w-8 h-8 shrink-0 rounded-full overflow-hidden border-2 border-gray-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 flex items-center justify-center">
                         @if(Auth::user()->avatar_path)
                             <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url(Auth::user()->avatar_path) }}" alt="Avatar" class="w-full h-full object-cover">
                         @else
-                            {{ substr(Auth::user()->nama ?? 'U', 0, 2) }}
+                            <span class="text-[10px] font-black text-slate-600 dark:text-zinc-300 leading-none">{{ strtoupper(substr(Auth::user()->nama ?? 'U', 0, 1)) }}</span>
                         @endif
                     </div>
                     <div x-show="expanded" x-cloak x-transition class="min-w-0 flex-1">
-                        <div class="text-sm font-medium text-gray-800 dark:text-zinc-100 truncate" title="{{ Auth::user()->nama }}">{{ Auth::user()->nama }}</div>
-                        <div class="text-xs text-gray-500 dark:text-zinc-300 truncate max-w-[12rem]" title="{{ Auth::user()->email }}">{{ Auth::user()->email }}</div>
-                        @if (Auth::user()?->role_id)
-                            <span class="mt-2 inline-flex rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-semibold text-rose-700 dark:bg-rose-900/30 dark:text-rose-300">{{ Auth::user()->roleLabel() }}</span>
-                        @endif
+                        <p class="text-xs font-bold text-gray-800 dark:text-zinc-200 truncate leading-tight">{{ explode(' ', Auth::user()->nama ?? 'User')[0] }}</p>
+                        <p class="text-[10px] text-gray-400 dark:text-zinc-500 truncate leading-tight" title="{{ Auth::user()->email }}">{{ Auth::user()->email }}</p>
                     </div>
-                </button>
-
-                <div x-show="userOpen && expanded" x-cloak x-transition @click.away="userOpen = false" class="absolute left-0 bottom-full z-50 mb-2 w-48 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded shadow-lg">
-                    <div class="py-2">
-                        <a @click.stop href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-zinc-200 hover:bg-gray-50 dark:hover:bg-zinc-800">Profile</a>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button @click.stop type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-zinc-800">Log Out</button>
-                        </form>
-                    </div>
-                </div>
+                </a>
             </div>
         </div>
     </div>
@@ -169,30 +168,30 @@
             </ul>
         </div>
 
-        <div class="mt-auto border-t border-gray-200 dark:border-zinc-800 p-4 overflow-visible">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-white text-sm font-bold shrink-0">
+        <div class="mt-auto border-t border-gray-200 dark:border-zinc-800 p-4">
+            <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 h-11 px-3 rounded-2xl transition-all duration-150 overflow-hidden {{ request()->routeIs('profile.edit') ? 'bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50' : 'hover:bg-gray-50 dark:hover:bg-zinc-900/40' }}">
+                <div class="w-8 h-8 shrink-0 rounded-full overflow-hidden border-2 border-gray-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 flex items-center justify-center">
                     @if(Auth::user()->avatar_path)
                         <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url(Auth::user()->avatar_path) }}" alt="Avatar" class="w-full h-full object-cover">
                     @else
-                        {{ substr(Auth::user()->nama ?? 'U', 0, 2) }}
+                        <span class="text-[10px] font-black text-slate-600 dark:text-zinc-300 leading-none">{{ strtoupper(substr(Auth::user()->nama ?? 'U', 0, 1)) }}</span>
                     @endif
                 </div>
                 <div class="min-w-0 flex-1">
-                    <div class="text-sm font-medium text-gray-800 dark:text-zinc-100 truncate" title="{{ Auth::user()->nama }}">{{ Auth::user()->nama }}</div>
-                    <div class="text-xs text-gray-500 dark:text-zinc-300 truncate" title="{{ Auth::user()->email }}">{{ Auth::user()->email }}</div>
-                    @if (Auth::user()?->role_id)
-                        <span class="mt-2 inline-flex rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-semibold text-rose-700 dark:bg-rose-900/30 dark:text-rose-300">{{ Auth::user()->roleLabel() }}</span>
-                    @endif
+                    <p class="text-xs font-bold text-gray-800 dark:text-zinc-200 truncate leading-tight">{{ explode(' ', Auth::user()->nama ?? 'User')[0] }}</p>
+                    <p class="text-[10px] text-gray-400 dark:text-zinc-500 truncate leading-tight" title="{{ Auth::user()->email }}">{{ Auth::user()->email }}</p>
                 </div>
-            </div>
-            <div class="mt-3 space-y-1">
-                <a href="{{ route('profile.edit') }}" class="block rounded-md px-3 py-2 text-sm text-gray-700 dark:text-zinc-200 hover:bg-gray-50 dark:hover:bg-zinc-800">Profile</a>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="w-full text-left rounded-md px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-zinc-800">Log Out</button>
-                </form>
-            </div>
+            </a>
+
+            <form method="POST" action="{{ route('logout') }}" class="mt-1.5">
+                @csrf
+                <button type="submit" class="flex items-center gap-3 h-11 px-3 rounded-2xl text-gray-400 dark:text-zinc-500 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition duration-150 w-full">
+                    <span class="shrink-0 w-[18px] flex justify-center">
+                        <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M8.5 10c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1" /><path d="M10.828.122A.5.5 0 0 1 11 .5V1h.5A1.5 1.5 0 0 1 13 2.5V15h1.5a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1H3V1.5a.5.5 0 0 1 .43-.495l7-1a.5.5 0 0 1 .398.117M11.5 2H11v13h1V2.5a.5.5 0 0 0-.5-.5M4 1.934V15h6V1.077z" /></svg>
+                    </span>
+                    <span class="text-sm font-semibold">Keluar</span>
+                </button>
+            </form>
         </div>
     </aside>
 </div>
