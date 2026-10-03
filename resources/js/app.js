@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const searchInput = document.querySelector('[data-datatable-search-input]');
 
         const dataTable = new DataTable(table, {
-            perPage: 25,
+            perPage: 14,
             perPageSelect: false,
             searchable: false,
             labels: { info: '' },
