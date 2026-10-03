@@ -1,8 +1,6 @@
 <?php
 
 use App\Models\User;
-use App\Models\Application;
-use App\Models\UserApplication;
 
 test('profile page is displayed', function () {
     $user = User::factory()->create();
@@ -85,68 +83,4 @@ test('delete profile route no longer exists', function () {
 
     $response->assertStatus(405);
     $this->assertNotNull($user->fresh());
-});
-
-test('user can deactivate own application access', function () {
-    $user = User::factory()->create();
-    $app = Application::firstOrCreate(
-        ['slug' => 'reminder'],
-        ['name' => 'Reminder', 'description' => 'Sistem pengingat dokumen.']
-    );
-    $userApp = UserApplication::firstOrCreate(
-        ['user_id' => $user->id, 'application_id' => $app->id],
-        ['is_active' => true, 'approved_by' => $user->id, 'approved_at' => now()]
-    );
-
-    $response = $this
-        ->actingAs($user)
-        ->patch('/profile/access');
-
-    $response
-        ->assertSessionHasNoErrors()
-        ->assertRedirect('/profile');
-
-    $userApp->refresh();
-    $this->assertFalse($userApp->is_active);
-    $this->assertSame($user->id, $userApp->approved_by);
-    $this->assertNotNull($userApp->approved_at);
-});
-
-test('user cannot reactivate own application access while logged in', function () {
-    $user = User::factory()->create();
-    $app = Application::firstOrCreate(
-        ['slug' => 'reminder'],
-        ['name' => 'Reminder', 'description' => 'Sistem pengingat dokumen.']
-    );
-    $userApp = UserApplication::firstOrCreate(
-        ['user_id' => $user->id, 'application_id' => $app->id],
-        ['is_active' => false]
-    );
-
-    $this->actingAs($user)
-        ->patch('/profile/access')
-        ->assertRedirect('/profile')
-        ->assertSessionHasErrors('access');
-
-    $this->assertFalse($userApp->fresh()->is_active);
-});
-
-test('toggle access creates pending row without activating', function () {
-    $user = User::factory()->create();
-    $app = Application::firstOrCreate(
-        ['slug' => 'reminder'],
-        ['name' => 'Reminder', 'description' => 'Sistem pengingat dokumen.']
-    );
-
-    $this->actingAs($user)
-        ->patch('/profile/access')
-        ->assertRedirect('/profile')
-        ->assertSessionHasErrors('access');
-
-    $userApp = UserApplication::where('user_id', $user->id)
-        ->where('application_id', $app->id)
-        ->first();
-
-    $this->assertNotNull($userApp);
-    $this->assertFalse($userApp->is_active);
 });

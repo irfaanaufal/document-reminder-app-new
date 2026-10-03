@@ -120,28 +120,6 @@
                         <input id="emp-joined" readonly tabindex="-1" value="{{ $user->created_at?->format('d M Y') }}" class="{{ $profileReadonlyClass }}">
                     </div>
                 </div>
-
-                <div class="mt-4 space-y-3 border-t border-neutral-100 pt-4 dark:border-neutral-800">
-                    @if ($isAppActive ?? false)
-                        <p class="text-[11px] leading-relaxed text-neutral-400 dark:text-neutral-500">
-                            Nonaktifkan akses aplikasi ini dari akun Anda. Untuk mengaktifkan kembali, hubungi tim IT.
-                        </p>
-                        <form method="POST" action="{{ route('profile.access') }}">
-                            @csrf
-                            @method('PATCH')
-                            <button type="submit" class="rounded-lg bg-rose-600 px-4 py-2 text-xs font-bold text-white shadow-sm transition-all hover:bg-rose-700 active:scale-[0.98]">
-                                {{ __('Nonaktifkan Akses') }}
-                            </button>
-                        </form>
-                    @else
-                        <p class="text-[11px] leading-relaxed text-neutral-400 dark:text-neutral-500">
-                            Akses aplikasi tidak aktif. Aktivasi hanya dapat dilakukan oleh tim IT melalui persetujuan akses.
-                        </p>
-                    @endif
-                    @error('access')
-                        <p class="{{ $profileErrorClass }}">{{ $message }}</p>
-                    @enderror
-                </div>
             </div>
 
             {{-- 4 · Ubah Password --}}

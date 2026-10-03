@@ -96,7 +96,6 @@ Route::middleware(['auth', 'applications.access', 'throttle:30,1'])->group(funct
 Route::middleware(['auth', 'throttle:30,1'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::patch('/profile/access', [ProfileController::class, 'toggleAccess'])->name('profile.access');
     Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar');
 });
 

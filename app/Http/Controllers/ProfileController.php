@@ -55,36 +55,6 @@ class ProfileController extends Controller
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
-    public function toggleAccess(Request $request): RedirectResponse
-    {
-        $user = $request->user();
-        $appId = $this->resolveApplicationId();
-
-        $userApp = \App\Models\UserApplication::where('user_id', $user->id)
-            ->where('application_id', $appId)
-            ->first();
-
-        if (! $userApp) {
-            $userApp = \App\Models\UserApplication::create([
-                'user_id' => $user->id,
-                'application_id' => $appId,
-                'is_active' => false,
-            ]);
-        }
-
-        // Aktivasi hanya via approval tim IT (Kelola Permintaan di it-system).
-        if (! $userApp->is_active) {
-            return Redirect::route('profile.edit')->withErrors([
-                'access' => 'Akses hanya dapat diaktifkan oleh tim IT.',
-            ]);
-        }
-
-        $userApp->is_active = false;
-        $userApp->save();
-
-        return Redirect::route('profile.edit')->with('success', 'Akses aplikasi berhasil dinonaktifkan.');
-    }
-
     private function resolveApplicationId(): int
     {
         $configured = (int) config('app.application_id');

@@ -157,12 +157,12 @@ class User extends Authenticatable
 ```
 (Register/login sudah menampilkan pesan aktivasi)
   ↓
-Admin aktifkan via DB / ProfileController::toggleAccess → is_active = true
+Admin aktifkan via Kelola Permintaan di it-system → is_active = true
 ```
 
 ### Aktivasi oleh Admin (di IT System)
 ```
-Admin aktifkan via DB / ProfileController::toggleAccess
+Admin aktifkan via Kelola Permintaan di it-system
   ↓
 user_applications.is_active = true
 ```
