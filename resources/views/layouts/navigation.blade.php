@@ -86,7 +86,7 @@
                    :class="expanded ? 'gap-3 px-3' : 'justify-center px-0'">
                     <div class="w-8 h-8 shrink-0 rounded-full overflow-hidden border-2 border-gray-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 flex items-center justify-center">
                         @if(Auth::user()->avatar_path)
-                            <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url(Auth::user()->avatar_path) }}" alt="Avatar" class="w-full h-full object-cover">
+                            <img src="{{ asset('storage/'.Auth::user()->avatar_path) }}" alt="Avatar" class="w-full h-full object-cover">
                         @else
                             <span class="text-[10px] font-black text-slate-600 dark:text-zinc-300 leading-none">{{ strtoupper(substr(Auth::user()->nama ?? 'U', 0, 1)) }}</span>
                         @endif
@@ -172,7 +172,7 @@
             <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 h-11 px-3 rounded-2xl transition-all duration-150 overflow-hidden {{ request()->routeIs('profile.edit') ? 'bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50' : 'hover:bg-gray-50 dark:hover:bg-zinc-900/40' }}">
                 <div class="w-8 h-8 shrink-0 rounded-full overflow-hidden border-2 border-gray-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 flex items-center justify-center">
                     @if(Auth::user()->avatar_path)
-                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url(Auth::user()->avatar_path) }}" alt="Avatar" class="w-full h-full object-cover">
+                        <img src="{{ asset('storage/'.Auth::user()->avatar_path) }}" alt="Avatar" class="w-full h-full object-cover">
                     @else
                         <span class="text-[10px] font-black text-slate-600 dark:text-zinc-300 leading-none">{{ strtoupper(substr(Auth::user()->nama ?? 'U', 0, 1)) }}</span>
                     @endif

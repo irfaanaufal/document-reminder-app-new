@@ -94,7 +94,7 @@ class ProfileController extends Controller
 
         return response()->json([
             'success' => true,
-            'avatar_url' => Storage::disk('public')->url($path),
+            'avatar_url' => asset('storage/'.$path),
         ]);
     }
 }

@@ -34,7 +34,7 @@
                         <div class="group relative aspect-square h-24 shrink-0 lg:h-auto">
                             <div id="avatar-preview" class="relative h-full w-full overflow-hidden rounded-lg border border-neutral-300 bg-white shadow-sm dark:border-neutral-600 dark:bg-neutral-800">
                                 @if ($user->avatar_path)
-                                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($user->avatar_path) }}" alt="Avatar" class="h-full w-full object-cover">
+                                    <img src="{{ asset('storage/'.$user->avatar_path) }}" alt="Avatar" class="h-full w-full object-cover">
                                 @else
                                     <span class="flex h-full w-full items-center justify-center text-2xl font-black text-neutral-700 dark:text-neutral-200 lg:text-5xl">{{ strtoupper(substr($user->nama ?? 'U', 0, 2)) }}</span>
                                 @endif
