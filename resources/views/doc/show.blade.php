@@ -48,28 +48,13 @@
 
         {{-- ===== Header Card ===== --}}
         <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm">
-            <div class="flex flex-wrap items-center justify-between gap-3">
-                <div class="min-w-0">
-                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-                        <h3 class="min-w-0 break-words text-xl font-bold text-gray-900 dark:text-zinc-100">{{ $reminder->nama_dokumen }}</h3>
-                        <span class="shrink-0 inline-flex items-center rounded-full px-3 py-1 text-xs font-medium {{ $statusColor }}">
-                            {{ $statusLabel }}
-                        </span>
-                    </div>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-zinc-400">{{ $reminder->penerbit_tujuan ?? 'Penerbit' }}</p>
-                </div>
-                <div class="ml-auto flex shrink-0 items-center gap-2">
-                    <a href="{{ route('dokumen') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-xs font-bold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
-                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                        Kembali
-                    </a>
-                    @can('update', $reminder)
-                        <a href="{{ route('doc.edit', $reminder->id) }}" class="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white">
-                            Edit Dokumen
-                        </a>
-                    @endcan
-                </div>
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <h3 class="min-w-0 break-words text-xl font-bold text-gray-900 dark:text-zinc-100">{{ $reminder->nama_dokumen }}</h3>
+                <span class="shrink-0 inline-flex items-center rounded-full px-3 py-1 text-xs font-medium {{ $statusColor }}">
+                    {{ $statusLabel }}
+                </span>
             </div>
+            <p class="mt-1 text-sm text-gray-500 dark:text-zinc-400">{{ $reminder->penerbit_tujuan ?? 'Penerbit' }}</p>
         </div>
 
         {{-- ===== Informasi Dokumen ===== --}}
