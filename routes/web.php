@@ -67,12 +67,9 @@ Route::middleware(['auth', 'applications.access', 'throttle:30,1'])->group(funct
                 $today
             );
 
-            $reminders = $remindersQuery->get()->sort(function ($a, $b) {
-                $aTs = $a->tanggal_expired?->getTimestamp() ?? PHP_INT_MAX;
-                $bTs = $b->tanggal_expired?->getTimestamp() ?? PHP_INT_MAX;
-
-                return [$aTs <=> $bTs, $b->id <=> $a->id];
-            })->values();
+            $reminders = $remindersQuery
+                ->orderByRaw('(tanggal_expired IS NULL), tanggal_expired ASC, id DESC')
+                ->get();
 
         return view('doc.read', [
             'reminders' => $reminders,
