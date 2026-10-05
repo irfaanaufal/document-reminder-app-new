@@ -1,203 +1,121 @@
-<x-guest-layout>
-    <div id="auth-container" class="relative w-full max-w-4xl bg-white rounded-[32px] shadow-[0_30px_60px_rgba(0,0,0,0.15)] overflow-hidden flex min-h-[640px]">
-        
-        <div id="form-side" class="w-full md:w-1/2 h-full absolute top-0 left-0 transition-all duration-700 ease-in-out z-10">
-            
-            <div id="signin-section" class="w-full h-full min-h-[640px] flex flex-col justify-center items-center px-8 py-10 sm:px-16 bg-white transition-all duration-500">
-                <h2 class="text-3xl font-bold text-slate-900 tracking-tight">Log In</h2>
+<x-split-auth-layout title="Masuk — {{ config('app.name', 'Reminder App') }}">
+    <div class="flex h-screen flex-col overflow-hidden bg-black font-['-apple-system',_BlinkMacSystemFont,_'Segoe_UI',_sans-serif] lg:grid lg:grid-cols-2">
 
-                <span class="text-xs text-slate-400 mt-4 tracking-wide">Gunakan username dan kata sandi Anda</span>
-                <x-auth-session-status class="mt-4 text-xs" :status="session('status')" />
+        {{-- Panel hitam: kiri (desktop) / atas (mobile) --}}
+        <div class="relative flex h-[35vh] shrink-0 items-center justify-center bg-black lg:order-2 lg:h-auto">
+            <div class="absolute top-5 right-5 text-[13px] font-semibold tracking-[0.3em] text-white/90 lg:top-10 lg:right-10">REMINDER-APP</div>
+            <img src="{{ asset('images/login.png') }}" alt="{{ config('app.name', 'Reminder App') }}" class="oc-anim h-[60%] w-[60%] object-contain" style="animation: oc-float 6s ease-in-out infinite, oc-glow 4s ease-in-out infinite" />
+            <style>
+                @keyframes oc-float {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-12px); }
+                }
+                @keyframes oc-glow {
+                    0%, 100% { filter: drop-shadow(0 0 12px rgba(255,255,255,0.08)); }
+                    50% { filter: drop-shadow(0 0 24px rgba(255,255,255,0.18)); }
+                }
+                @media (prefers-reduced-motion: reduce) {
+                    .oc-anim { animation: none !important; filter: none !important; }
+                }
+            </style>
+        </div>
 
-                <form method="POST" action="{{ route('login') }}" class="w-full mt-4 space-y-4">
+        {{-- Panel form: kanan (desktop) / bawah (mobile) --}}
+        <div class="flex min-h-0 flex-1 items-start justify-start overflow-y-auto rounded-tl-[48px] bg-white px-6 pt-7 lg:order-1 lg:items-center lg:justify-center lg:rounded-tl-none lg:px-20">
+            <div class="w-full max-w-[360px] pb-10 lg:pb-0">
+                <h1 class="text-center text-[27px] text-neutral-900" style="font-family: 'Newsreader', Georgia, serif">Masuk</h1>
+
+                @if (session('status'))
+                    <div class="mt-6 text-center text-[13px] font-medium text-emerald-600">{{ session('status') }}</div>
+                @endif
+
+                <form method="POST" action="{{ route('login') }}" class="mt-8 space-y-3">
                     @csrf
+
                     <div>
-                        <input type="text" name="username" value="{{ old('username') }}" required autofocus placeholder="Username" class="w-full px-4 py-3 bg-slate-100 border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-600/20 transition-all text-slate-800" />
-                        <x-input-error :messages="$errors->get('username')" class="mt-1 text-xs" />
+                        <label for="username" class="sr-only">Email atau username</label>
+                        <input
+                            id="username"
+                            type="text"
+                            name="username"
+                            value="{{ old('username') }}"
+                            required
+                            autofocus
+                            autocomplete="username"
+                            placeholder="Email atau username"
+                            class="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 shadow-none outline-none transition-colors placeholder-gray-400 focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400"
+                        />
+                        <x-input-error :messages="$errors->get('username')" class="mt-1.5" />
+                        <x-input-error :messages="$errors->get('activation_needed')" class="mt-1.5" />
                     </div>
-                    <div>
-                        <input type="password" name="password" required placeholder="Kata Sandi" class="w-full px-4 py-3 bg-slate-100 border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-600/20 transition-all text-slate-800" />
-                        <x-input-error :messages="$errors->get('password')" class="mt-1 text-xs" />
+
+                    <div class="relative">
+                        <label for="password" class="sr-only">Kata Sandi</label>
+                        <input
+                            id="password"
+                            type="password"
+                            name="password"
+                            required
+                            autocomplete="current-password"
+                            placeholder="Kata Sandi"
+                            class="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3 pr-11 text-sm text-gray-900 shadow-none outline-none transition-colors placeholder-gray-400 focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400"
+                        />
+                        <button
+                            type="button"
+                            onclick="togglePassword()"
+                            class="absolute top-1/2 right-3.5 -translate-y-1/2 text-gray-400 transition hover:text-gray-600"
+                            aria-label="Tampilkan kata sandi"
+                        >
+                            <svg id="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                                <path d="M2 12c1-3 5-7 10-7s9 4 10 7c-1 3-5 7-10 7s-9-4-10-7z" stroke-linecap="round" stroke-linejoin="round" />
+                                <circle cx="12" cy="12" r="3" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <svg id="eye-closed" class="hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                                <path d="M3 3l18 18M10.6 10.7a2.5 2.5 0 003.5 3.5M9.3 5.5A10.4 10.4 0 0112 5c5 0 9 4 10 7a12.5 12.5 0 01-3.1 4.2M6.2 6.6C4.3 8 2.9 10 2 12c1 3 5 7 10 7 1.4 0 2.7-.3 3.9-.8" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
+                        <x-input-error :messages="$errors->get('password')" class="mt-1.5" />
                     </div>
-                    <div class="flex items-center justify-between text-xs pt-1">
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" name="remember" class="rounded border-slate-300 text-slate-800 focus:ring-slate-700 w-3.5 h-3.5">
-                            <span class="ml-1.5 text-slate-500 font-medium">Ingat saya</span>
+
+                    <div class="flex items-center justify-between pt-1">
+                        <label class="flex cursor-pointer items-center gap-2 text-[12px] text-gray-500">
+                            <input type="checkbox" name="remember" class="h-3.5 w-3.5 rounded border-gray-300 text-gray-900 focus:ring-gray-400">
+                            Ingat saya
                         </label>
-                        @if (Route::has('password.request'))
-                            <a class="text-slate-500 hover:text-slate-800 font-medium transition hover:underline" href="{{ route('password.request') }}">Lupa Kata Sandi?</a>
-                        @endif
                     </div>
-                    <div class="flex justify-center pt-2">
-                        <button type="submit" class="bg-slate-800 text-white text-xs font-bold tracking-wider uppercase px-12 py-3.5 rounded-xl shadow-lg shadow-slate-900/20 hover:bg-slate-900 active:scale-95 transition-all duration-150">Masuk</button>
-                    </div>
+
+                    <button
+                        type="submit"
+                        class="mt-2 w-full justify-center rounded-full border-0 bg-gray-900 py-3 text-[13px] font-semibold tracking-wide text-white shadow-none transition-colors hover:bg-gray-800 focus:ring-2 focus:ring-gray-400 focus:ring-offset-0"
+                    >
+                        Masuk
+                    </button>
                 </form>
-                <p class="mt-8 text-xs text-slate-500 md:hidden">Belum punya akun? <button type="button" onclick="toggleAuthMode(true)" class="text-slate-800 font-bold ml-1 hover:underline">Daftar Sekarang</button></p>
-            </div>
 
-            <div id="signup-section" class="w-full h-full min-h-[640px] hidden flex-col justify-center items-center px-8 py-10 sm:px-16 bg-white transition-all duration-500">
-                <h2 class="text-3xl font-bold text-slate-900 tracking-tight">Buat Akun Baru</h2>
-
-                <span class="text-xs text-slate-400 mt-4 tracking-wide">Masukkan FID untuk verifikasi data karyawan</span>
-
-                <form method="POST" action="{{ route('register') }}" class="w-full mt-4 space-y-3.5">
-                    @csrf
-                    <div>
-                        <div class="flex gap-2">
-                            <input type="text" name="fid" id="fid_input" required placeholder="FID (Nomor Induk)" class="w-full px-4 py-3 bg-slate-100 border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-600/20 transition-all text-slate-800" />
-                            <button type="button" id="check_fid_btn" onclick="checkFid()" class="px-4 py-3 bg-slate-700 text-white text-xs font-semibold rounded-xl hover:bg-slate-800 transition whitespace-nowrap">Cek</button>
-                        </div>
-                        <div id="fid_result" class="mt-1 text-xs"></div>
-                        <x-input-error :messages="$errors->get('fid')" class="mt-1 text-xs" />
-                    </div>
-                    <div id="register_fields" class="space-y-3.5 hidden">
-                        <div>
-                            <input type="text" name="nama" id="nama_input" required placeholder="Nama Lengkap" class="w-full px-4 py-3 bg-slate-100 border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-600/20 transition-all text-slate-800" readonly />
-                            <x-input-error :messages="$errors->get('nama')" class="mt-1 text-xs" />
-                        </div>
-                        <div>
-                            <input type="text" name="username" value="{{ old('username') }}" required placeholder="Username" class="w-full px-4 py-3 bg-slate-100 border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-600/20 transition-all text-slate-800" />
-                            <x-input-error :messages="$errors->get('username')" class="mt-1 text-xs" />
-                        </div>
-                        <div>
-                            <input type="email" name="email" value="{{ old('email') }}" required placeholder="Alamat Email" class="w-full px-4 py-3 bg-slate-100 border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-600/20 transition-all text-slate-800" />
-                            <x-input-error :messages="$errors->get('email')" class="mt-1 text-xs" />
-                        </div>
-                        <div>
-                            <input type="tel" name="no_telpon" value="{{ old('no_telpon') }}" required placeholder="Nomor Telepon" class="w-full px-4 py-3 bg-slate-100 border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-600/20 transition-all text-slate-800" />
-                            <x-input-error :messages="$errors->get('no_telpon')" class="mt-1 text-xs" />
-                        </div>
-                        <div>
-                            <input type="password" name="password" required placeholder="Kata Sandi" class="w-full px-4 py-3 bg-slate-100 border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-600/20 transition-all text-slate-800" />
-                            <x-input-error :messages="$errors->get('password')" class="mt-1 text-xs" />
-                        </div>
-                        <div>
-                            <input type="password" name="password_confirmation" required placeholder="Konfirmasi Kata Sandi" class="w-full px-4 py-3 bg-slate-100 border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-600/20 transition-all text-slate-800" />
-                            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-1 text-xs" />
-                        </div>
-                        <div class="flex justify-center pt-2">
-                            <button type="submit" class="bg-slate-800 text-white text-xs font-bold tracking-wider uppercase px-12 py-3.5 rounded-xl shadow-lg shadow-slate-900/20 hover:bg-slate-900 active:scale-95 transition-all duration-150">Daftar</button>
-                        </div>
-                    </div>
-                </form>
-                <p class="mt-8 text-xs text-slate-500 md:hidden">Sudah punya akun? <button type="button" onclick="toggleAuthMode(false)" class="text-slate-800 font-bold ml-1 hover:underline">Masuk Di Sini</button></p>
+                <div class="mt-5 flex items-center justify-center gap-3 text-[12px] text-gray-500">
+                    <span class="text-gray-300">·</span>
+                    @if (Route::has('password.request'))
+                        <a href="{{ route('password.request') }}" class="transition hover:text-gray-700">Lupa password?</a>
+                    @endif
+                    <a href="{{ route('register') }}" class="transition hover:text-gray-700">Daftar</a>
+                </div>
             </div>
         </div>
-
-        <div id="overlay-container" class="hidden md:block absolute top-0 left-1/2 w-1/2 h-full overflow-hidden transition-all duration-700 ease-in-out z-30 rounded-l-[150px]">
-            <div id="overlay-content" class="absolute top-0 left-0 w-[200%] h-full bg-gradient-to-br from-slate-800 to-slate-900 text-white transition-all duration-700 ease-in-out flex">
-                
-                <div class="w-1/2 h-full flex flex-col justify-center items-center text-center p-12">
-                    <h2 class="text-3xl font-bold tracking-tight">Selamat Datang Kembali!</h2>
-                    <p class="text-xs text-slate-300/90 max-w-[240px] mt-4 leading-relaxed">Silakan masuk kembali menggunakan akun Anda untuk tetap terhubung bersama kami</p>
-                    <div class="pt-6">
-                        <button type="button" onclick="toggleAuthMode(true)" class="border border-white text-white text-xs font-bold tracking-wider uppercase px-12 py-3 rounded-xl hover:bg-white hover:text-slate-900 active:scale-95 transition shadow-md">
-                            Daftar
-                        </button>
-                    </div>
-                </div>
-
-                <div class="w-1/2 h-full flex flex-col justify-center items-center text-center p-12">
-                    <h2 class="text-3xl font-bold tracking-tight">Halo, Teman!</h2>
-                    <p class="text-xs text-slate-300/90 max-w-[240px] mt-4 leading-relaxed">Daftarkan data diri Anda untuk menikmati seluruh fitur layanan yang tersedia</p>
-                    <div class="pt-6">
-                        <button type="button" onclick="toggleAuthMode(false)" class="border border-white text-white text-xs font-bold tracking-wider uppercase px-12 py-3 rounded-xl hover:bg-white hover:text-slate-900 active:scale-95 transition shadow-md">
-                            Masuk
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        function toggleAuthMode(isSignUp) {
-            const formSide = document.getElementById('form-side');
-            const overlayContainer = document.getElementById('overlay-container');
-            const overlayContent = document.getElementById('overlay-content');
-            
-            const signinSection = document.getElementById('signin-section');
-            const signupSection = document.getElementById('signup-section');
-
-            const isMobile = window.innerWidth < 768;
-
-            if (isSignUp) {
-                if (!isMobile) {
-                    formSide.style.transform = 'translateX(100%)';
-                    overlayContainer.style.transform = 'translateX(-100%)';
-                    overlayContainer.classList.remove('rounded-l-[150px]');
-                    overlayContainer.classList.add('rounded-r-[150px]');
-                    overlayContent.style.transform = 'translateX(-50%)';
-                }
-                signinSection.classList.add('hidden');
-                signinSection.classList.remove('flex');
-                
-                signupSection.classList.add('flex');
-                signupSection.classList.remove('hidden');
-            } else {
-                if (!isMobile) {
-                    formSide.style.transform = 'translateX(0)';
-                    overlayContainer.style.transform = 'translateX(0)';
-                    overlayContainer.classList.remove('rounded-r-[150px]');
-                    overlayContainer.classList.add('rounded-l-[150px]');
-                    overlayContent.style.transform = 'translateX(0)';
-                }
-                signinSection.classList.add('flex');
-                signinSection.classList.remove('hidden');
-                
-                signupSection.classList.add('hidden');
-                signupSection.classList.remove('flex');
-            }
+        function togglePassword() {
+            var input = document.getElementById('password');
+            var open = document.getElementById('eye-open');
+            var closed = document.getElementById('eye-closed');
+            var showing = input.type === 'text';
+            input.type = showing ? 'password' : 'text';
+            open.classList.toggle('hidden', !showing);
+            closed.classList.toggle('hidden', showing);
         }
 
-        function escapeHtml(str) {
-            const div = document.createElement('div');
-            div.textContent = str;
-            return div.innerHTML;
-        }
-
-        function checkFid() {
-            const fid = document.getElementById('fid_input').value.trim();
-            const resultDiv = document.getElementById('fid_result');
-            const registerFields = document.getElementById('register_fields');
-            const namaInput = document.getElementById('nama_input');
-            const checkBtn = document.getElementById('check_fid_btn');
-
-            if (!fid) {
-                resultDiv.innerHTML = '<span class="text-red-500">Masukkan FID terlebih dahulu.</span>';
-                return;
-            }
-
-            checkBtn.disabled = true;
-            checkBtn.textContent = 'Mengecek...';
-            resultDiv.innerHTML = '<span class="text-slate-400">Memeriksa data...</span>';
-
-            fetch('{{ url("register/check-karyawan") }}/' + encodeURIComponent(fid))
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        resultDiv.innerHTML = '<span class="text-green-600">Data ditemukan: ' + escapeHtml(data.karyawan.nama_karyawan) + ' (' + escapeHtml(data.karyawan.divisi) + ')</span>';
-                        namaInput.value = data.karyawan.nama_karyawan;
-                        registerFields.classList.remove('hidden');
-                    } else {
-                        resultDiv.innerHTML = '<span class="text-red-500">' + escapeHtml(data.message || 'FID tidak valid.') + '</span>';
-                        registerFields.classList.add('hidden');
-                    }
-                })
-                .catch(err => {
-                    resultDiv.innerHTML = '<span class="text-red-500">Terjadi kesalahan. Coba lagi.</span>';
-                    registerFields.classList.add('hidden');
-                })
-                .finally(() => {
-                    checkBtn.disabled = false;
-                    checkBtn.textContent = 'Cek';
-                });
-        }
-
-        // SweetAlert for activation errors (tampil setiap kali login gagal)
+        // SweetAlert khusus gerbang aktivasi reminder (tetap berlaku)
         @if($errors->has('activation_needed'))
             document.addEventListener('DOMContentLoaded', function() {
                 Swal.fire({
@@ -209,13 +127,5 @@
                 });
             });
         @endif
-
-        @if($errors->has('nama') || $errors->has('email') || $errors->has('no_telpon') || $errors->has('password_confirmation') || $errors->has('fid') || $errors->has('username') || $errors->has('password') || old('nama') || old('email') || old('no_telpon') || old('fid') || old('username'))
-            window.addEventListener('DOMContentLoaded', function() {
-                if ({{ $errors->has('nama') || $errors->has('fid') || $errors->has('no_telpon') || $errors->has('password_confirmation') || old('nama') || old('fid') ? 'true' : 'false' }}) {
-                    toggleAuthMode(true);
-                }
-            });
-        @endif
     </script>
-</x-guest-layout>
+</x-split-auth-layout>
