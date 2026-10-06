@@ -68,7 +68,13 @@ Route::middleware(['auth', 'applications.access', 'throttle:30,1'])->group(funct
             );
 
             $reminders = $remindersQuery
-                ->orderByRaw('(tanggal_expired IS NULL), tanggal_expired ASC, id DESC')
+                ->orderByRaw(
+                    'CASE WHEN tanggal_expired IS NULL THEN 2
+                          WHEN tanggal_expired < ? THEN 1
+                          ELSE 0 END,
+                     tanggal_expired ASC, id DESC',
+                    [$today->toDateString()]
+                )
                 ->get();
 
         return view('doc.read', [

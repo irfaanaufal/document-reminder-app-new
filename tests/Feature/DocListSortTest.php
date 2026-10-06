@@ -78,7 +78,7 @@ function assertFirstOccurrenceOrder(string $html, array $markers): void
     );
 }
 
-test('/dokumen lists most urgent expiry first and null expiry last', function () {
+test('/dokumen lists urgent active first, expired below active, null expiry last', function () {
     $user = sortTestSetup(5);
 
     sortTestMakeReminder($user, 'SORT/NONE/004', null);
@@ -91,10 +91,32 @@ test('/dokumen lists most urgent expiry first and null expiry last', function ()
         ->assertOk();
 
     assertFirstOccurrenceOrder($response->getContent(), [
-        'SORT/PAST/001',
         'SORT/NEAR/002',
         'SORT/FAR/003',
+        'SORT/PAST/001',
         'SORT/NONE/004',
+    ]);
+});
+
+test('/dokumen sorts all expired documents below active ones oldest-expired first', function () {
+    $user = sortTestSetup(5);
+
+    sortTestMakeReminder($user, 'SORT/OLD/502', now()->subDay()->toDateString());
+    sortTestMakeReminder($user, 'SORT/OLD/501', now()->subYear()->toDateString());
+    sortTestMakeReminder($user, 'SORT/NEAR/504', now()->addDays(5)->toDateString());
+    sortTestMakeReminder($user, 'SORT/OLD/503', null);
+    sortTestMakeReminder($user, 'SORT/NEAR/505', now()->addMonths(6)->toDateString());
+
+    $response = $this->actingAs($user)
+        ->get('/dokumen?jenis=semua')
+        ->assertOk();
+
+    assertFirstOccurrenceOrder($response->getContent(), [
+        'SORT/NEAR/504',
+        'SORT/NEAR/505',
+        'SORT/OLD/501',
+        'SORT/OLD/502',
+        'SORT/OLD/503',
     ]);
 });
 
